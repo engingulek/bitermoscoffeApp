@@ -2,19 +2,19 @@ import React from "react";
 import "./Menu.css";
 function Menu() {
   return (
-    <div class="navbar">
+    <div className="navbar">
       <span>Ismarla</span>
-      <div class="subnav">
-        <button class="subnavbtn">Kahve </button>
-        <div class="subnav-content">
+      <div className="subnav">
+        <button className="subnavbtn">Kahve </button>
+        <div className="subnav-content">
           <li>Filtre Kahve</li>
           <li>Espresso</li>
           <li>Yöresel Kahveler</li>
         </div>
       </div>
-      <div class="subnav">
-        <button class="subnavbtn">Çay </button>
-        <div class="subnav-content">
+      <div className="subnav">
+        <button className="subnavbtn">Çay </button>
+        <div className="subnav-content">
           <li>Ada Çayı</li>
           <li>Nane Limon</li>
           <li>Ihlamaur</li>
