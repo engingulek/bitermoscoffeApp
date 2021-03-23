@@ -1,21 +1,16 @@
 import React, { useState } from "react";
 import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import PersonIcon from "@material-ui/icons/Person";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import HomeIcon from "@material-ui/icons/Home";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import CloseIcon from "@material-ui/icons/Close";
 import styled from "styled-components";
+import Person from "@material-ui/icons/Person";
 import "./Header.css";
 
 function Header() {
-  const [expandIcon, setExpandIcon] = useState(false);
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const expandIconBttn = () => {
-    setExpandIcon(!expandIcon);
-  };
 
   const inputChange = (e) => {
     if (e.target.value.length > 0) {
@@ -77,9 +72,32 @@ function Header() {
                 <PersonIcon />
               </div>
             </DropdownToggle>
-            <DropdownMenu style={{ marginRight: "1px" }}>
-              lmcl.mdvsd vdşvkdvsvs lvmdlşvmsvmsd lvmnşvlsvmşslvs
-              lşsmvmvşmmsdvlmds lvmdmvdsvşlşmşslvmşsmv
+            <DropdownMenu style={{ marginRight: "11px" }}>
+              <div className="userContainer">
+                <div className="userSing">
+                  <div className="userImg">
+                    <Person style={{ fontSize: 30 }} />
+                  </div>
+                  <div className="userNameNumber">
+                    <div className="userName">
+                      <span>Engin Gülek</span>
+                    </div>
+                    <div className="userNumber">
+                      <span>+905345658496</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="userMore">
+                  <ol>
+                    <li>Adreslerim</li>
+                    <li>Favori Ürümlerim</li>
+                    <li>Geçmiş Siparişlerim</li>
+                    <li>Fatura Bilgileri</li>
+
+                    <li>Çıkış Yap</li>
+                  </ol>
+                </div>
+              </div>
             </DropdownMenu>
           </Dropdown>
         </div>

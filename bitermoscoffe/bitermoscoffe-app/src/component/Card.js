@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+
 function Card() {
   return (
     <Wrapper>
@@ -7,7 +8,7 @@ function Card() {
         <ProductImg>
           <div>
             <img
-              src="https://lh3.googleusercontent.com/proxy/usGEMo6oA_weshMM0Xjkn89fmE6hrwA7XqlWJJevJ4kjzDCz38_5mrV_LHO8sm3cNBE8FsgTgjNdHwk95BkIUIZshpnTHxgmRiBuMn1w4yIltSzaGW4"
+              src="https://foto.haberler.com/haber/2017/12/05/dunya-turk-kahvesi-gunu-nde-kahveniz-kahve-10314099_6526_o.jpg"
               alt="kahve"
             />
           </div>
@@ -19,7 +20,8 @@ function Card() {
           <span>Taze Öğütülmüş</span>
         </ProductType>
         <ProductCount>
-          <span>19.00(1 litre termos)</span>
+          <span>19.00₺</span>
+          <span>(1 litre termos)</span>
         </ProductCount>
         <ProductBttn>
           <div>
@@ -49,7 +51,7 @@ const CardContainer = styled.div`
 
   padding-top: 30px;
   padding-bottom: 30px;
-  margin-left: 80px;
+  margin-left: 50px;
   :hover {
     cursor: pointer;
     div {
@@ -80,15 +82,16 @@ const ProductName = styled.div`
 `;
 const ProductType = styled.div`
   padding-top: 10px;
-
+  margin-top: 7px;
+  margin-bottom: 7px;
   height: 100%;
   background-color: #91091e;
 
   span {
     color: white;
-    padding-bottom: 3px;
-    padding-top: 3px;
-
+    padding-bottom: 5px;
+    padding-top: 5px;
+    align-self: center;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,6 +111,7 @@ const ProductBttn = styled.div`
     display: flex;
     justify-content: center;
     visibility: hidden;
+    margin-top: 5px;
 
     button {
       border: none;
@@ -116,6 +120,7 @@ const ProductBttn = styled.div`
       padding: 14px;
       padding-right: 35px;
       padding-left: 35px;
+      border-radius: 10px;
       background-color: white;
       color: #fc8621;
       border: 1px solid #fc8621;
