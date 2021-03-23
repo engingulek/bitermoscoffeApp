@@ -1,0 +1,30 @@
+.headerContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #6f4e37;
+  padding: 10px;
+  color: white;
+}
+.userIcons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 5px;
+  align-items: center;
+  color: white;
+}
+
+.userIcons:hover {
+  cursor: pointer;
+}
+
+.headertitle {
+  font-size: 27px;
+  margin-right: 10px;
+}
+
+.dropDownToggle:hover {
+  background-color: red;
+}
