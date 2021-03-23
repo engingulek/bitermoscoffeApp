@@ -1,13 +1,10 @@
-.app{
-
-    display: flex;
-    flex-direction: column;
+.app {
+  display: flex;
+  flex-direction: column;
 }
 
- .cardDesign{
-  
-    
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-} 
+.cardDesign {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}

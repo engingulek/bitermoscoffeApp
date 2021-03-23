@@ -32,10 +32,9 @@ function Card() {
 }
 
 const Wrapper = styled.div`
-margin-top:20px;
-margin-bottom:30px;
-height:100%;
-
+  margin-top: 20px;
+  margin-bottom: 30px;
+  height: 100%;
 `;
 const CardContainer = styled.div`
   display: flex;
@@ -43,7 +42,7 @@ const CardContainer = styled.div`
   justify-content: center;
   align-self: center;
   width: 300px;
- 
+
   border: 1px solid lightgray;
   border-radius: 15px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.05), 0 0px 40px rgba(0, 0, 0, 0.08);
@@ -53,12 +52,9 @@ const CardContainer = styled.div`
   margin-left: 80px;
   :hover {
     cursor: pointer;
-    div{
-        visibility:visible;
+    div {
+      visibility: visible;
     }
-   
-   
-    
   }
 `;
 const ProductImg = styled.div`
@@ -111,34 +107,25 @@ const ProductBttn = styled.div`
   div {
     display: flex;
     justify-content: center;
-    visibility:hidden;
-   
+    visibility: hidden;
 
-    button{
-        border:none;
-        outline:none;
-        outline-style:none;
-        padding:14px;
-        padding-right:35px;
-        padding-left:35px;
-        background-color:white;
-        color:#fc8621;
-        border:1px solid #fc8621;
-        :hover{
-        background-color:#fc8621;
-        color:white;
+    button {
+      border: none;
+      outline: none;
+      outline-style: none;
+      padding: 14px;
+      padding-right: 35px;
+      padding-left: 35px;
+      background-color: white;
+      color: #fc8621;
+      border: 1px solid #fc8621;
+      :hover {
+        background-color: #fc8621;
+        color: white;
+      }
     }
-        
-       
-       
-
-    }
-
-    
   }
   padding-top: 10px;
 `;
-
-
 
 export default Card;

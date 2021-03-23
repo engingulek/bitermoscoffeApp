@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
-import { Dropdown, DropdownMenu, DropdownToggle } from 'reactstrap';
+import React, { useState } from "react";
+import { Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import PersonIcon from "@material-ui/icons/Person";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import HomeIcon from "@material-ui/icons/Home";
 import ArrowForwardIosIcon from "@material-ui/icons/ArrowForwardIos";
 import CloseIcon from "@material-ui/icons/Close";
-import styled from "styled-components"
-import "./Header.css"
+import styled from "styled-components";
+import "./Header.css";
 
 function Header() {
-  
   const [expandIcon, setExpandIcon] = useState(false);
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -30,77 +29,63 @@ function Header() {
     setInputChange(false);
   };
 
-
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const toggle = () => setDropdownOpen(prevState => !prevState);
+  const toggle = () => setDropdownOpen((prevState) => !prevState);
   return (
     <div className="header">
-    <div className="headerContainer">
-    <div className="headertitle">
-    bitermoscoffe
-    </div>
-    <div className="headerSearchBar">
-    <SearchBar>
-          {inputChanges ? (
-            <div>
-              <input
-                type="text"
-                placeholder="bi termos kahvemi"
-                onChange={inputChange}
-              />
+      <div className="headerContainer">
+        <div className="headertitle">bitermoscoffe</div>
+        <div className="headerSearchBar">
+          <SearchBar>
+            {inputChanges ? (
               <div>
-                <CloseIcon onClick={clearSearchBar} />
+                <input
+                  type="text"
+                  placeholder="bi termos kahvemi"
+                  onChange={inputChange}
+                />
+                <div>
+                  <CloseIcon onClick={clearSearchBar} />
+                </div>
               </div>
-            </div>
-          ) : (
-            <div>
-              <input
-                type="text"
-                value={inputValue}
-                placeholder="bi termos kahvemi"
-                onChange={inputChange}
-              />
+            ) : (
               <div>
-                <HomeIcon />
-                <span>Ev</span>
-                <ArrowForwardIosIcon fontSize="small" />
+                <input
+                  type="text"
+                  value={inputValue}
+                  placeholder="bi termos kahvemi"
+                  onChange={inputChange}
+                />
+                <div>
+                  <HomeIcon />
+                  <span>Ev</span>
+                  <ArrowForwardIosIcon fontSize="small" />
+                </div>
               </div>
-            </div>
-          )}
-        </SearchBar>
-    
-    </div>
-    <div className="userInfo">
-
-    <Dropdown direction="right" isOpen={dropdownOpen} toggle={toggle}>
-      <DropdownToggle
-        tag="span"
-        data-toggle="dropdown"
-        aria-expanded={dropdownOpen}
-      >
-      <div className="userIcons">
-      <PersonIcon />
+            )}
+          </SearchBar>
+        </div>
+        <div className="userInfo">
+          <Dropdown direction="right" isOpen={dropdownOpen} toggle={toggle}>
+            <DropdownToggle
+              tag="span"
+              data-toggle="dropdown"
+              aria-expanded={dropdownOpen}
+            >
+              <div className="userIcons">
+                <PersonIcon />
+              </div>
+            </DropdownToggle>
+            <DropdownMenu style={{ marginRight: "1px" }}>
+              lmcl.mdvsd vdşvkdvsvs lvmdlşvmsvmsd lvmnşvlsvmşslvs
+              lşsmvmvşmmsdvlmds lvmdmvdsvşlşmşslvmşsmv
+            </DropdownMenu>
+          </Dropdown>
+        </div>
       </div>
-      </DropdownToggle>
-      <DropdownMenu style={{marginRight:"1px"}}>
-        lmcl.mdvsd
-        vdşvkdvsvs
-        lvmdlşvmsvmsd
-        lvmnşvlsvmşslvs
-        lşsmvmvşmmsdvlmds
-        lvmdmvdsvşlşmşslvmşsmv
-      </DropdownMenu>
-    </Dropdown>
-    
-
-    
     </div>
-    
-    </div>
-      
-    </div>
-  )
+  );
 }
 
 const SearchBar = styled.div`
@@ -133,5 +118,4 @@ const SearchBar = styled.div`
   }
 `;
 
-
-export default Header
+export default Header;
