@@ -7,10 +7,14 @@ import CloseIcon from "@material-ui/icons/Close";
 import styled from "styled-components";
 import Person from "@material-ui/icons/Person";
 import "./Header.css";
+import {
+  Link
+} from "react-router-dom"
 
 function Header() {
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [userSing , setUserSing]=useState(false)
 
   const inputChange = (e) => {
     if (e.target.value.length > 0) {
@@ -23,6 +27,18 @@ function Header() {
   const clearSearchBar = () => {
     setInputChange(false);
   };
+
+ const singInbttnOnClick =()=>{
+   setUserSing(true);
+   setDropdownOpen(false);
+   
+ }
+
+ const singOutbttnOnClick =()=>{
+   setUserSing(false);
+   setDropdownOpen(false);
+
+ }
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -72,32 +88,52 @@ function Header() {
                 <PersonIcon />
               </div>
             </DropdownToggle>
-            <DropdownMenu style={{ marginRight: "11px" }}>
-              <div className="userContainer">
-                <div className="userSing">
-                  <div className="userImg">
-                    <Person style={{ fontSize: 30 }} />
-                  </div>
-                  <div className="userNameNumber">
-                    <div className="userName">
-                      <span>Engin Gülek</span>
-                    </div>
-                    <div className="userNumber">
-                      <span>+905345658496</span>
-                    </div>
-                  </div>
+            <DropdownMenu style={{ marginRight: "11px" ,borderRadius:"10px" }}>
+            {
+              userSing?<div className="userSingIn">
+              <div className="userSing">
+                <div className="userImg">
+                  <Person style={{ fontSize: 30 }} />
                 </div>
-                <div className="userMore">
-                  <ol>
-                    <li>Adreslerim</li>
-                    <li>Favori Ürümlerim</li>
-                    <li>Geçmiş Siparişlerim</li>
-                    <li>Fatura Bilgileri</li>
-
-                    <li>Çıkış Yap</li>
-                  </ol>
+                <div className="userNameNumber">
+                  <div className="userName">
+                    <span>Engin Gülek</span>
+                  </div>
+                  <div className="userNumber">
+                    <span>+905345658496</span>
+                  </div>
                 </div>
               </div>
+              <div className="userMore">
+                <ol>
+                  <li>Adreslerim</li>
+                  <li>Favori Ürümlerim</li>
+                  <li>Geçmiş Siparişlerim</li>
+                  <li>Fatura Bilgileri</li>
+
+                  <li onClick={singOutbttnOnClick}>Çıkış Yap</li>
+                </ol>
+              </div>
+            </div>:<div className="userSingOut">
+            <div className="singInbttn" onClick={singInbttnOnClick}>
+            <button>
+            Giriş Yap
+            </button>
+            
+            </div>
+            <div className="singUpbttn" >
+            <button>
+            <Link to="/singUp"  className="linksingUp">
+            Üye Ol
+            </Link>
+           
+            </button>
+            
+            </div>
+            
+            </div>
+            }
+              
             </DropdownMenu>
           </Dropdown>
         </div>
