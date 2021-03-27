@@ -6,6 +6,11 @@
   background-color: #6f4e37;
   padding: 10px;
   color: white;
+  position: fixed; 
+  width: 100%; 
+  z-index: 1000; 
+  top: 0; 
+  left: 0; 
 }
 .userIcons {
   display: flex;
@@ -138,6 +143,14 @@
   color: white;
 }
 .linksingUp:hover{
+  text-decoration: none;
+  color: white;
+}
+
+.linkSingIn{
+  color: white;
+}
+.linkSingIn:hover{
   text-decoration: none;
   color: white;
 }

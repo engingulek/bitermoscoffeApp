@@ -8,3 +8,20 @@
   flex-direction: row;
   flex-wrap: wrap;
 }
+
+.menu{
+  margin-top: 80px;
+}
+
+.cardAndCart{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  
+  
+}
+
+.cart{
+ margin-right: 30px;
+
+}

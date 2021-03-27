@@ -4,6 +4,8 @@ import Header from "./component/Header";
 import Menu from "./component/Menu";
 import { BrowserRouter , Switch, Route, Link } from "react-router-dom";
 import SingUp from "./component/SingUp";
+import SingIn from "./component/SingIn";
+import Cart from "./component/Cart";
 
 function App() {
   return (
@@ -12,22 +14,34 @@ function App() {
     <Switch>
     <Route exact path="/">
     <div className="mainPage">
-        <div>
+        <div className="header">
           <Header />
         </div>
-        <div>
+        <div className="menu">
           <Menu />
         </div>
+        <div className="cardAndCart">
         <div className="cardDesign">
           <Card />
           <Card />
           <Card />
           <Card />
         </div>
+        <div className="cart">
+        <Cart/>
+        
+        </div>
+        
+        </div>
+        
       </div>
     </Route>
     <Route path="/singUp">
     <SingUp/>
+    </Route>
+    <Route path="/singIn">
+    <SingIn/>
+    
     </Route>
     
     </Switch>
