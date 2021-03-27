@@ -36,7 +36,7 @@ function Card() {
 const Wrapper = styled.div`
   margin-top: 20px;
   margin-bottom: 30px;
-  height: 100%;
+  
 `;
 const CardContainer = styled.div`
   display: flex;

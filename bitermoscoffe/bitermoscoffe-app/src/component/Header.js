@@ -77,6 +77,7 @@ function Header() {
             )}
           </SearchBar>
         </div>
+        
         <div className="userInfo">
           <Dropdown direction="right" isOpen={dropdownOpen} toggle={toggle}>
             <DropdownToggle
@@ -117,8 +118,12 @@ function Header() {
             </div>:<div className="userSingOut">
             <div className="singInbttn" onClick={singInbttnOnClick}>
             <button>
-            Giriş Yap
+            <Link to="/singIn" className="linkSingIn">
+             Giriş Yap
+            </Link>
             </button>
+           
+           
             
             </div>
             <div className="singUpbttn" >
@@ -137,6 +142,7 @@ function Header() {
             </DropdownMenu>
           </Dropdown>
         </div>
+        
       </div>
     </div>
   );
