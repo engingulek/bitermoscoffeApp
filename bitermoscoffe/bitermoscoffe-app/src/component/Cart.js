@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
+import {Link} from "react-router-dom";
 function Cart() {
   return (
     <Wrapper>
@@ -70,9 +70,12 @@ function Cart() {
       </CartContainer>
       <ButtonConfirm>
         <div>
-          <button>
+        <Link className="link" to="/cartConfirm">
+        <button>
           Sepeti Onayla
           </button>
+        </Link>
+          
           </div>
         </ButtonConfirm>
       
@@ -187,6 +190,13 @@ border-radius:10px;
     background-color: #03c03c;
 }
 
+}
+.link{
+  text-decoration:none;
+  color:white;
+  :hover{
+    color:white;
+  }
 }
 
 
