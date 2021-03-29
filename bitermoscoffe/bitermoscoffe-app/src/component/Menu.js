@@ -1,27 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Menu.css";
+import db from "../firebase";
 function Menu() {
+  const [menu, setMenu] = useState([]);
+
+  useEffect(() => {
+    db.collection("menu").onSnapshot((onSnapshot) => {
+      const menuItem = [];
+      onSnapshot.forEach((doc) => {
+        menuItem.push(doc.data());
+      });
+      setMenu(menuItem);
+    });
+  }, []);
+
   return (
     <div className="navbar">
       <span>Ismarla</span>
-      <div className="subnav">
-        <button className="subnavbtn">Kahve </button>
-        <div className="subnav-content">
-          <li>Filtre Kahve</li>
-          <li>Espresso</li>
-          <li>Yöresel Kahveler</li>
+
+      {menu.map((menuItems) => (
+        <div className="subnav">
+          <button className="subnavbtn"> {menuItems.menuTitle} </button>
+          <div className="subnav-content">
+            {menuItems.subMenuTitle.map((sub) => (
+              <li>{sub}</li>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="subnav">
-        <button className="subnavbtn">Çay </button>
-        <div className="subnav-content">
-          <li>Ada Çayı</li>
-          <li>Nane Limon</li>
-          <li>Ihlamaur</li>
-          <li>Kuş burnu</li>
-        </div>
-      </div>
-      <span>Hakkımızda</span>
+      ))}
     </div>
   );
 }
