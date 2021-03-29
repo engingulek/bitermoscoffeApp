@@ -6,6 +6,7 @@ import { BrowserRouter , Switch, Route, Link } from "react-router-dom";
 import SingUp from "./component/SingUp";
 import SingIn from "./component/SingIn";
 import Cart from "./component/Cart";
+import CartConfirm from "./component/CartConfirm";
 
 function App() {
   return (
@@ -41,6 +42,10 @@ function App() {
     </Route>
     <Route path="/singIn">
     <SingIn/>
+    
+    </Route>
+    <Route path="/cartConfirm">
+    <CartConfirm/>
     
     </Route>
     
