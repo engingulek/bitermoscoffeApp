@@ -24,9 +24,7 @@ function App() {
         <div className="cardAndCart">
         <div className="cardDesign">
           <Card />
-          <Card />
-          <Card />
-          <Card />
+          
         </div>
         <div className="cart">
         <Cart/>

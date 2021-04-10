@@ -1,13 +1,61 @@
-import React from "react";
+import React, { useRef } from "react";
 import styled from "styled-components";
-import FacebookIcon from "@material-ui/icons/Facebook";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
+import { auth, providerGoogle } from "../firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { emailSingIn, login, logout,selectUser } from "../reduxtoolkit/features/login/loginSlice";
 function SingIn() {
+  const dispatch = useDispatch()
+const user = useSelector(state=>state.loginRed)
+const inputEmail = useRef(null)
+const inputPassword = useRef(null)
+
+const singInwithEmailandPassword=(event)=>{
+  event.preventDefault();
+  console.log(inputEmail.current.value+" "+inputPassword.current.value )
+  auth.signInWithEmailAndPassword(inputEmail.current.value,inputPassword.current.value)
+  .then(user=>{
+    const emailUserInfo=[]
+  
+    
+    dispatch(emailSingIn(user.user))
+    console.log("Çalıştı")
+
+  }).catch((error)=>{
+    console.log(error)
+  })
+
+
+
+
+}
+
+
+
+
+
+
+ const singInGoogle=()=>{
+  auth.signInWithPopup(providerGoogle).catch((error)=>console.log("Hata"))
+    auth.onAuthStateChanged((authUser)=>{
+      if(authUser)
+      {
+        dispatch(login(authUser))
+       
+       
+     
+       
+        
+      }
+    })
+
+ }
+
+
   return (
     <Wrapper>
       <PageTitle>
@@ -21,9 +69,12 @@ function SingIn() {
           <span>Giriş Yap</span>
         </div>
         <div className="inputContainer">
-          <input type="text" placeholder="Email adresinizi giriniz" />
-          <input type="password" placeholder="password" />
-          <button>Giriş Yap</button>
+        <form onSubmit={singInwithEmailandPassword}>
+        <input type="text" placeholder="Email adresinizi giriniz" ref={inputEmail} />
+        <input type="password" placeholder="password" ref={inputPassword}/>
+        <button >Giriş Yap</button>
+        </form>
+         
         </div>
         <div className="withSocialMedia">
           <div className="socialMediaTitle">
@@ -33,7 +84,7 @@ function SingIn() {
             <div className="facebookIcon">
               <FaFacebook color="blue" />
             </div>
-            <div className="googleIcon">
+            <div className="googleIcon" onClick={singInGoogle}>
               <FcGoogle />
             </div>
           </div>
@@ -93,7 +144,7 @@ const SingInContainer = styled.div`
       font-weight: 700;
     }
   }
-  .inputContainer {
+  .inputContainer>form {
     display: flex;
     flex-direction: column;
     justify-content: center;

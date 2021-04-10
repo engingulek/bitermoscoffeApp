@@ -1,27 +1,62 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
+import { auth, providerFacebook, providerGoogle } from "../firebase";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    Link
-  } from "react-router-dom"
+  login,
+  logout,
+  selectUser,
+} from "../reduxtoolkit/features/login/loginSlice";
 
 function SingUp() {
+  const dispatch = useDispatch();
+   const user = useSelector((state) => state.loginRed);
+  const inputName = useRef(null);
+  const inputSurname = useRef(null);
+  const inputEmail = useRef(null);
+  const inputPassword = useRef(null);
+
+  const singUpPasswordAndEmail = (event) => {
+    event.preventDefault();
+   if ( inputName.current.value!=="" || inputSurname.value!=="" || inputEmail.current.value!=="" || inputPassword.current.value.length>=6 ) {
+     auth.createUserWithEmailAndPassword(
+       inputEmail.current.value,
+       inputPassword.current.value
+     ).then(function(result){
+       return result.user.updateProfile({
+         displayName:inputName.current.value+" "+inputSurname.current.value
+       })
+    
+     }).catch(err=>{
+       console.log(err)
+     })
+   }
+  };
+
+
+
+  const singUpGoogle = () => {
+    auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        dispatch(login(authUser));
+      }
+    });
+  };
+
   return (
     <Wrapper>
       <PageTitle>
-       
         <Link to="/" className="link">
-        <span>
-        
-        bitermoscoffe
-        
-        </span>
+          <span>bitermoscoffe</span>
         </Link>
       </PageTitle>
 
       <SingUpContainer>
         <div className="withSocialMedia">
           <div className="title">
-            <span>Sosyal medya ile üye ol  </span>
+            <span>Sosyal medya ile üye ol </span>
           </div>
           <div className="socialMediaIcon">
             <div className="facebookIcon">
@@ -30,7 +65,7 @@ function SingUp() {
                 alt="facebookIcon"
               />
             </div>
-            <div className="googleIcon">
+            <div className="googleIcon" onClick={singUpGoogle}>
               <img
                 src="https://img-authors.flaticon.com/google.jpg"
                 alt="googleIcon"
@@ -43,16 +78,31 @@ function SingUp() {
             <span>E-posta adresi ile üye ol</span>
           </div>
           <div className="userForm">
-            <form>
-              <input type="text" placeholder="Ad" id="name" />
-              <input type="text" placeholder="Soyad" id="surname" />
-              <input type="text" placeholder="E-posta Adresi" id="eposta" />
-              <input type="password" placeholder="Şifre" id="password" />
+            <form onSubmit={singUpPasswordAndEmail}>
+              <input type="text" placeholder="Ad" id="name" ref={inputName} />
+              <input
+                type="text"
+                placeholder="Soyad"
+                id="surname"
+                ref={inputSurname}
+              />
+              <input
+                type="text"
+                placeholder="E-posta Adresi"
+                id="eposta"
+                ref={inputEmail}
+              />
+              <input
+                type="password"
+                placeholder="Şifre"
+                id="password"
+                ref={inputPassword}
+              />
+              <div className="singUpBttn">
+                <button>Üye Ol</button>
+              </div>
             </form>
           </div>
-        </div>
-        <div className="singUpBttn">
-          <button>Üye Ol</button>
         </div>
       </SingUpContainer>
     </Wrapper>
@@ -73,15 +123,14 @@ const Wrapper = styled.div`
 `;
 
 const PageTitle = styled.div`
-  .link{
-      text-decoration:none;
+  .link {
+    text-decoration: none;
     span {
-    font-size: xx-large;
-    font-weight: 700;
-    color: #6f4e37;
+      font-size: xx-large;
+      font-weight: 700;
+      color: #6f4e37;
+    }
   }
-  }
-  
 `;
 
 const SingUpContainer = styled.div`

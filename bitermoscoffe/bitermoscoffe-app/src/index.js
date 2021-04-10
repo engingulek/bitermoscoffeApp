@@ -5,10 +5,15 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "react-datepicker/dist/react-datepicker.css";
+import store from './reduxtoolkit/app/store';
+import { Provider } from 'react-redux';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+  <Provider store={store}>
+  <App />
+  </Provider>
+  
   </React.StrictMode>,
   document.getElementById('root')
 );
