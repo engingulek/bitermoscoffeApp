@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from "react";
-import setHours from "date-fns/setHours"
-import setMinutes from "date-fns/setMinutes"
-import addMonths  from "date-fns/addMonths"
+import setHours from "date-fns/setHours";
+import setMinutes from "date-fns/setMinutes";
+import addMonths from "date-fns/addMonths";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-
 import DatePicker from "react-datepicker";
-
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+
+
+
+
 
 function CartConfirm() {
   const [modal, setModal] = useState(false);
   const [timeModal, setTimeModal] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
-  const [hourss,setHourss]=useState(new Date().getHours()+1)
-  const [orderTime,setOrderTime]=useState("")
+  const [hourss, setHourss] = useState(new Date().getHours() + 1);
+  const [orderTime, setOrderTime] = useState("");
   const time = new Date();
-  const oorderTime= time.setMinutes(time.getHours()+60)
-  const [date,setDate] =useState(oorderTime);
-  const a=0;
- 
- 
-
+  const oorderTime = time.setMinutes(time.getHours() + 60);
+  const [date, setDate] = useState(oorderTime);
+  const a = 0;
   const useStyles = makeStyles((theme) => ({
     container: {
       display: "flex",
@@ -35,21 +34,23 @@ function CartConfirm() {
     },
   }));
 
-
-  
   useEffect(() => {
-    let time = new Date(date)
+    let time = new Date(date);
     let hours = time.getHours();
     let minutes = time.getMinutes();
-    let day = time.getDay()
-    var gunler=["pazar","pazartesi","salı","çarşamba","perşembe","cuma","cumartesi"];
+    let day = time.getDay();
+    var gunler = [
+      "pazar",
+      "pazartesi",
+      "salı",
+      "çarşamba",
+      "perşembe",
+      "cuma",
+      "cumartesi",
+    ];
 
- 
-    setOrderTime(hours+":"+minutes+" "+gunler[day])
-  }, [date])
- 
-
-  
+    setOrderTime(hours + ":" + minutes + " " + gunler[day]);
+  }, [date]);
 
   const timeToggle = () => {
     setTimeModal(!timeModal);
@@ -58,7 +59,7 @@ function CartConfirm() {
   const toggle = () => {
     setModal(!modal);
   };
-  
+
   const classes = useStyles();
   return (
     <Wrapper>
@@ -84,26 +85,18 @@ function CartConfirm() {
                     <label htmlFor="now">Şimdi Teslim Et</label>
                   </div>
                   <div>
-                  <div>
-                  <input
-                      type="radio"
-                      name="time"
-                      id="time"
-                      onClick={timeToggle}
-                    />
-                    <label htmlFor="time">Zaman Belirleme
-                    </label>
-                  </div>
-                  <div className="defaultDeliveryTime">
-                  <span>
-                    {
-                        "   Geçerli Zaman  "+ 
-                        orderTime
-                     }
-                    </span>
-                  </div>
-                    
-                    
+                    <div>
+                      <input
+                        type="radio"
+                        name="time"
+                        id="time"
+                        onClick={timeToggle}
+                      />
+                      <label htmlFor="time">Zaman Belirleme</label>
+                    </div>
+                    <div className="defaultDeliveryTime">
+                      <span>{"   Geçerli Zaman  " + orderTime}</span>
+                    </div>
                   </div>
                 </form>
               </div>
@@ -123,11 +116,10 @@ function CartConfirm() {
                 <span>Teslimat Adresi</span>
               </div>
               <div className="userAdress">
-                <span>
-                  Çoban Hasso Sokak Hidayet Mahallesi Doğan Apt No:7 Daire:3
-                </span>
+                <span>Siparişin Teslim Edileceği Adres</span>
               </div>
             </div>
+           
           </OrderUserDec>
         </Order>
         <OrderButton>
@@ -169,7 +161,7 @@ function CartConfirm() {
             fontWeight: "600",
           }}
         >
-          <DatePicker 
+          <DatePicker
             selected={startDate}
             onChange={(date) => setDate(date)}
             locale="pt-TR"
@@ -178,12 +170,10 @@ function CartConfirm() {
             timeIntervals={60}
             dateFormat="Pp"
             inline
-            minTime={setHours(setMinutes(new Date(), a),hourss)}
+            minTime={setHours(setMinutes(new Date(), a), hourss)}
             maxTime={setHours(setMinutes(new Date(), 30), 23)}
-         
             minDate={new Date()}
             maxDate={new Date()}
-           
           />
         </ModalBody>
         <ModalFooter>
@@ -268,7 +258,6 @@ const OrderDec = styled.div`
       margin-top: 30px;
       div {
         font-size: 18px;
-        
 
         label {
           margin-left: 20px;
@@ -284,8 +273,8 @@ const OrderDec = styled.div`
             cursor: pointer;
           }
         }
-        .defaultDeliveryTime{
-            font-size:15px;
+        .defaultDeliveryTime {
+          font-size: 15px;
         }
       }
     }

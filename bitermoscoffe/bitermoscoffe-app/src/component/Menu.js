@@ -3,9 +3,10 @@ import "./Menu.css";
 import db from "../firebase";
 function Menu() {
   const [menu, setMenu] = useState([]);
+  
 
   useEffect(() => {
-    db.collection("menu").onSnapshot((onSnapshot) => {
+    db.collection("menuList").onSnapshot((onSnapshot) => {
       const menuItem = [];
       onSnapshot.forEach((doc) => {
         menuItem.push(doc.data());
@@ -20,7 +21,9 @@ function Menu() {
 
       {menu.map((menuItems) => (
         <div className="subnav">
-          <button className="subnavbtn"> {menuItems.menuTitle} </button>
+          <button className="subnavbtn"> 
+          {menuItems.menuTitle} 
+          </button>
           <div className="subnav-content">
             {menuItems.subMenuTitle.map((sub) => (
               <li>{sub}</li>
