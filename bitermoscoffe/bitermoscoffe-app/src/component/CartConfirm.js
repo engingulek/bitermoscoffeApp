@@ -8,10 +8,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import DatePicker from "react-datepicker";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 
-
-
-
-
 function CartConfirm() {
   const [modal, setModal] = useState(false);
   const [timeModal, setTimeModal] = useState(false);
@@ -119,7 +115,6 @@ function CartConfirm() {
                 <span>Siparişin Teslim Edileceği Adres</span>
               </div>
             </div>
-           
           </OrderUserDec>
         </Order>
         <OrderButton>

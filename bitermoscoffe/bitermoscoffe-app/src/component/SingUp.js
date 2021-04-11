@@ -11,7 +11,7 @@ import {
 
 function SingUp() {
   const dispatch = useDispatch();
-   const user = useSelector((state) => state.loginRed);
+  const user = useSelector((state) => state.loginRed);
   const inputName = useRef(null);
   const inputSurname = useRef(null);
   const inputEmail = useRef(null);
@@ -19,22 +19,28 @@ function SingUp() {
 
   const singUpPasswordAndEmail = (event) => {
     event.preventDefault();
-   if ( inputName.current.value!=="" || inputSurname.value!=="" || inputEmail.current.value!=="" || inputPassword.current.value.length>=6 ) {
-     auth.createUserWithEmailAndPassword(
-       inputEmail.current.value,
-       inputPassword.current.value
-     ).then(function(result){
-       return result.user.updateProfile({
-         displayName:inputName.current.value+" "+inputSurname.current.value
-       })
-    
-     }).catch(err=>{
-       console.log(err)
-     })
-   }
+    if (
+      inputName.current.value !== "" ||
+      inputSurname.value !== "" ||
+      inputEmail.current.value !== "" ||
+      inputPassword.current.value.length >= 6
+    ) {
+      auth
+        .createUserWithEmailAndPassword(
+          inputEmail.current.value,
+          inputPassword.current.value
+        )
+        .then(function (result) {
+          return result.user.updateProfile({
+            displayName:
+              inputName.current.value + " " + inputSurname.current.value,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
-
-
 
   const singUpGoogle = () => {
     auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));

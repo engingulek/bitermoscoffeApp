@@ -4,7 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'alertifyjs/build/css/alertify.min.css'
 import "react-datepicker/dist/react-datepicker.css";
+
 import store from './reduxtoolkit/app/store';
 import { Provider } from 'react-redux';
 

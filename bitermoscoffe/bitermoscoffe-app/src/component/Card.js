@@ -1,42 +1,110 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import db from "../firebase";
+import alert from "alertifyjs"
 
 function Card() {
+  const [menu, setMenu] = useState([]);
+  const dispatch = useDispatch();
+  const menuSelector = useSelector((state) => state.menuRed);
+  console.log(menuSelector.menuInfo.menuTitleId);
+  
+
+  useEffect(() => {
+    if (menuSelector.menuInfo !== "") {
+      db.collection("products")
+        .where("bransName", "==", menuSelector.menuInfo.menuTitleId)
+        .onSnapshot((onSnapshot) => {
+          const menuItem = [];
+          onSnapshot.forEach((doc) => {
+            menuItem.push(doc.data());
+          });
+          setMenu(menuItem);
+        });
+    } else {
+      db.collection("products")
+      .onSnapshot((onSnapshot) => {
+        const menuItem = [];
+        onSnapshot.forEach((doc) => {
+          menuItem.push({
+          productId:doc.id,
+           productData: doc.data()
+          });
+        });
+        setMenu(menuItem);
+      });
+     
+    }
+  }, [menuSelector.menuInfo.menuTitleId]);
+
+
+  const addProducttoCart = (addItem)=>{
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    if(uidLoc===null)
+    {
+      alert.error("Giriş Yapmadan Sipariş Veremezsiziniz")
+      
+    }
+    else{
+       db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId).set({
+ addCartProductName:addItem.productData.productName,
+ addCartProductPrice:addItem.productData.price,
+ addCartProductQuantity:addItem.productData.quantity
+
+
+       })
+     .then(() => {
+        alert.success("Siparişiniz Başarıyla eklemiştir")
+    })
+    .catch((error) => {
+         console.error("Error writing document: ", error);
+    });
+console.log(addItem)
+      
+    }
+    
+
+  }
+
   return (
     <Wrapper>
-      <CardContainer>
-        <ProductImg>
-          <div>
-            <img
-              src="https://foto.haberler.com/haber/2017/12/05/dunya-turk-kahvesi-gunu-nde-kahveniz-kahve-10314099_6526_o.jpg"
-              alt="kahve"
-            />
-          </div>
-        </ProductImg>
-        <ProductName>
-          <span>Filtre Kahve</span>
-        </ProductName>
-        <ProductType>
-          <span>Taze Öğütülmüş</span>
-        </ProductType>
-        <ProductCount>
-          <span>19.00₺</span>
-          <span>(1 litre termos)</span>
-        </ProductCount>
-        <ProductBttn>
-          <div>
-            <button>Sepete Ekle</button>
-          </div>
-        </ProductBttn>
-      </CardContainer>
+      {menu.map((item) => (
+        <CardContainer>
+          <ProductImg>
+            <div>
+              <img src={item.productData.img} alt="kahve" />
+            </div>
+          </ProductImg>
+          <ProductName>
+            <span>{item.productData.productName}</span>
+          </ProductName>
+          <ProductType>
+            <span>Taze Öğütülmüş</span>
+          </ProductType>
+          <ProductCount>
+            <span>{item.productData.price} ₺</span>
+            <span>(1 litre termos)</span>
+          </ProductCount>
+          <ProductBttn>
+            <div onClick={()=>addProducttoCart(item)}>
+              <button>Sepete Ekle</button>
+            </div>
+          </ProductBttn>
+        </CardContainer>
+      ))}
+      
     </Wrapper>
+    
   );
 }
 
 const Wrapper = styled.div`
   margin-top: 20px;
   margin-bottom: 30px;
-  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 `;
 const CardContainer = styled.div`
   display: flex;
@@ -52,6 +120,7 @@ const CardContainer = styled.div`
   padding-top: 30px;
   padding-bottom: 30px;
   margin-left: 50px;
+  margin-bottom: 30px;
   :hover {
     cursor: pointer;
     div {
@@ -110,7 +179,7 @@ const ProductBttn = styled.div`
   div {
     display: flex;
     justify-content: center;
-    visibility: hidden;
+    /* visibility: hidden; */
     margin-top: 5px;
 
     button {

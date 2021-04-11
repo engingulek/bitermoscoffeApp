@@ -13,8 +13,7 @@
   color: #433520;
 }
 
-
-.subnav-content{
+.subnav-content {
   display: none;
   position: absolute;
   left: 0;
@@ -28,15 +27,12 @@
   overflow: hidden;
 }
 
-.subnav:hover .subnav-content{
+.subnav:hover .subnav-content {
   display: flex;
- flex-direction: row;
- justify-content: space-around;
- background-color: #025955;
- color: white;
- 
-  
-  
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: #025955;
+  color: white;
 }
 
 .subnav-content li {
@@ -60,4 +56,3 @@
   font-family: inherit;
   margin: 0;
 }
-
