@@ -1,60 +1,70 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
-
 
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { auth, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { emailSingIn, login, logout,selectUser } from "../reduxtoolkit/features/login/loginSlice";
+import {
+  emailSingIn,
+  login,
+  logout,
+  selectUser,
+} from "../reduxtoolkit/features/login/loginSlice";
 function SingIn() {
-  const dispatch = useDispatch()
-const user = useSelector(state=>state.loginRed)
-const inputEmail = useRef(null)
-const inputPassword = useRef(null)
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.loginRed);
+  const inputEmail = useRef(null);
+  const inputPassword = useRef(null);
+  const [alertMesage, setAlertMesage] = useState("")
+  const history = useHistory();
 
-const singInwithEmailandPassword=(event)=>{
-  event.preventDefault();
-  console.log(inputEmail.current.value+" "+inputPassword.current.value )
-  auth.signInWithEmailAndPassword(inputEmail.current.value,inputPassword.current.value)
-  .then(user=>{
-    const emailUserInfo=[]
+  const singInwithEmailandPassword = (event) => {
+    event.preventDefault();
+if (inputEmail.current.value==="" && inputPassword.current.value==="" ) {
+ setAlertMesage("Boş bırakıldı gerekli alanları doldurunuz")
   
-    
-    dispatch(emailSingIn(user.user))
-    console.log("Çalıştı")
-
-  }).catch((error)=>{
-    console.log(error)
-  })
-
-
-
-
 }
 
+else{
+  console.log(inputEmail.current.value + " " + inputPassword.current.value);
 
+    auth
+      .signInWithEmailAndPassword(
+        inputEmail.current.value,
+        inputPassword.current.value
+      )
+      .then((user) => {
+        const emailUserInfo = [];
 
+        dispatch(login(user.user));
+        console.log("Çalıştı");
+        history.push("/")
+      })
+      .catch((error) => {
+        if (error.code ==="auth/wrong-password") {
+          setAlertMesage("Üzgünüz, şifren yanlıştı. ")
+          
+          }
+          else if (error.code==="auth/user-not-found") {
+            setAlertMesage("Girdiğin kullanıcı adı bir hesaba ait değil.")
+            
+          }
+      });
 
+}
+    
+  };
 
-
- const singInGoogle=()=>{
-  auth.signInWithPopup(providerGoogle).catch((error)=>console.log("Hata"))
-    auth.onAuthStateChanged((authUser)=>{
-      if(authUser)
-      {
-        dispatch(login(authUser))
-       
-       
-     
-       
-        
+  const singInGoogle = () => {
+    auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        dispatch(login(authUser));
       }
-    })
-
- }
-
+    });
+  };
 
   return (
     <Wrapper>
@@ -69,12 +79,33 @@ const singInwithEmailandPassword=(event)=>{
           <span>Giriş Yap</span>
         </div>
         <div className="inputContainer">
-        <form onSubmit={singInwithEmailandPassword}>
-        <input type="text" placeholder="Email adresinizi giriniz" ref={inputEmail} />
-        <input type="password" placeholder="password" ref={inputPassword}/>
-        <button >Giriş Yap</button>
-        </form>
+        
+          <form  onSubmit={singInwithEmailandPassword}>
+            <input
+              type="text"
+              placeholder="Email adresinizi giriniz"
+              ref={inputEmail}
+            />
+            <input type="password" placeholder="password" ref={inputPassword} />
+            
          
+          <button >
+          Giriş Yap
+          
+          </button>
+         
+          </form>
+          
+        
+          
+         
+          
+        </div>
+        <div style={{color:"red", fontSize:"15px" , marginTop:"10px", margin:"10px"}}>
+        <span>
+        {alertMesage}
+        </span>
+      
         </div>
         <div className="withSocialMedia">
           <div className="socialMediaTitle">
@@ -144,7 +175,7 @@ const SingInContainer = styled.div`
       font-weight: 700;
     }
   }
-  .inputContainer>form {
+  .inputContainer > form {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -179,30 +210,27 @@ const SingInContainer = styled.div`
     border-top: 1px solid lightgray;
     width: 100%;
     margin-top: 20px;
-    .socialMediaTitle{
-        margin-top:15px;
-        span{
-            font-size:20px;
-            font-weight:700;
-            color:black;
-        }
+    .socialMediaTitle {
+      margin-top: 15px;
+      span {
+        font-size: 20px;
+        font-weight: 700;
+        color: black;
+      }
     }
-    .socialMediaIcon{
-        display:flex;
-        flex-direction:row;
-        font-size:35px;
-        margin-top:10px;
-       
-        :hover{
-            cursor:pointer;
-        }
-        .facebookIcon{
-            margin-right:40px;
-        }
+    .socialMediaIcon {
+      display: flex;
+      flex-direction: row;
+      font-size: 35px;
+      margin-top: 10px;
 
+      :hover {
+        cursor: pointer;
+      }
+      .facebookIcon {
+        margin-right: 40px;
+      }
     }
-
-   
   }
 `;
 

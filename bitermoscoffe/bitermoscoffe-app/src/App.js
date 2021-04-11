@@ -7,8 +7,12 @@ import SingUp from "./component/SingUp";
 import SingIn from "./component/SingIn";
 import Cart from "./component/Cart";
 import CartConfirm from "./component/CartConfirm";
+import db from "./firebase";
+
 
 function App() {
+ 
+ 
   return (
     <div className="app">
     <BrowserRouter>
@@ -23,6 +27,7 @@ function App() {
         </div>
         <div className="cardAndCart">
         <div className="cardDesign">
+       
           <Card />
           
         </div>
@@ -44,6 +49,7 @@ function App() {
     </Route>
     <Route path="/cartConfirm">
     <CartConfirm/>
+  
     
     </Route>
     

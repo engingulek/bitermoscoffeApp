@@ -7,18 +7,20 @@ import CloseIcon from "@material-ui/icons/Close";
 import styled from "styled-components";
 import Person from "@material-ui/icons/Person";
 import "./Header.css";
-import {
-  Link
-} from "react-router-dom"
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {login, logout,selectUser} from "../reduxtoolkit/features/login/loginSlice";
+import {
+  login,
+  logout,
+  selectUser,
+} from "../reduxtoolkit/features/login/loginSlice";
 
 function Header() {
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [userSing , setUserSing]=useState(false)
-  
-  const dispatch = useDispatch()
+  const [userSing, setUserSing] = useState(false);
+
+  const dispatch = useDispatch();
 
   const inputChange = (e) => {
     if (e.target.value.length > 0) {
@@ -32,91 +34,64 @@ function Header() {
     setInputChange(false);
   };
 
- const singInbttnOnClick =()=>{
-   setUserSing(true);
-   setDropdownOpen(false);
-   
- }
-
+  const singInbttnOnClick = () => {
+    setUserSing(true);
+    setDropdownOpen(false);
+  };
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
- const user = useSelector(state => state.loginRed)
- const [userLoc, setUserLoc] = useState([])
- console.log(user.emailInfo)
- useEffect(() => {
-   
-   
- }, )
-
-
-
- const localStarnge =()=>{
-   if(user.userInfo!==null)
-   {
-    const uid = user.userInfo.uid
-    const userName = user.userInfo.displayName;
-    const userEmail= user.userInfo.email
+  const user = useSelector((state) => state.loginRed);
+  const [userLoc, setUserLoc] = useState([]);
+  // console.log(user.emailInfo);
   
-    
- localStorage.setItem('userNameLoc',JSON.stringify(userName))
-  localStorage.setItem('uidLoc',JSON.stringify(uid))
-  localStorage.setItem('userEmailLoc',JSON.stringify(userEmail))
-  localStorage.setItem('uidLocOut',JSON.stringify(uid))
- 
- 
-  
-   }
-
-
-
- }
- const userNameLoc=  JSON.parse(localStorage.getItem("userNameLoc"))  
-  const uidLoc= JSON.parse(localStorage.getItem("uidLoc")) 
-  const userEmailLoc = localStorage.getItem("userEmailLoc")
-  const uidLocOut= JSON.parse(localStorage.getItem("uidLocOut")) 
-
   
 
+  const localStarnge = () => {
+    if (user.userInfo !== null) {
+      const uid = user.userInfo.uid;
+      const userName = user.userInfo.displayName;
+      const userEmail = user.userInfo.email;
 
+      localStorage.setItem("userNameLoc", JSON.stringify(userName));
+      localStorage.setItem("uidLoc", JSON.stringify(uid));
+      localStorage.setItem("userEmailLoc", JSON.stringify(userEmail));
+      localStorage.setItem("uidLocOut", JSON.stringify(uid));
+    }
+  };
+  const userNameLoc = JSON.parse(localStorage.getItem("userNameLoc"));
+  const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+  const userEmailLoc = localStorage.getItem("userEmailLoc");
+  const uidLocOut = JSON.parse(localStorage.getItem("uidLocOut"));
 
-  console.log(userNameLoc+" "+userEmailLoc+" "+" "+uidLoc)
+  console.log(userNameLoc + " " + userEmailLoc + " " + " " + uidLoc);
 
+  useEffect(() => {
+    localStarnge();
+  }, userLoc);
 
+  const [login, setuser] = useState("");
+  const deneme = () => {
+    console.log();
+    if (user.userInfo == null) {
+      setUserSing(false);
+      setuser("not");
+    } else {
+      setUserSing(true);
+      setuser(user.userInfo.displayName);
+    }
+  };
+  useEffect(() => {
+    deneme();
+  });
 
- useEffect(() => {
-  localStarnge()
- },userLoc)
-
-
-
- const [login, setuser] = useState("")
- const deneme = ()=>{
-   console.log()
-   if (user.userInfo==null) {
-     setUserSing(false)
-     setuser("not")
-     
-   }else{
-     setUserSing(true)
-     setuser(user.userInfo.displayName)
-   }
-
- }
- useEffect(() => {
-   deneme()
- }, )
-
- const singOutbttnOnClick =()=>{
-  setUserSing(false);
-  setDropdownOpen(false);
-  dispatch(logout())
-  localStorage.setItem('uidLocOut',JSON.stringify(null))
-  
- 
-
-}
-
+  const singOutbttnOnClick = () => {
+    setUserSing(false);
+    setDropdownOpen(false);
+    dispatch(logout());
+    localStorage.setItem("uidLocOut", JSON.stringify(null));
+    localStorage.setItem("uidLoc", JSON.stringify(null));
+  };
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   return (
@@ -153,7 +128,7 @@ function Header() {
             )}
           </SearchBar>
         </div>
-        
+
         <div className="userInfo">
           <Dropdown direction="right" isOpen={dropdownOpen} toggle={toggle}>
             <DropdownToggle
@@ -165,60 +140,54 @@ function Header() {
                 <PersonIcon />
               </div>
             </DropdownToggle>
-            <DropdownMenu style={{ marginRight: "11px" ,borderRadius:"10px" }}>
-            {
-              uidLocOut?<div className="userSingIn">
-              <div className="userSing">
-                <div className="userImg">
-                  <Person style={{ fontSize: 30 }} />
-                </div>
-                <div className="userNameNumber">
-                  <div className="userName">
-                    <span>{userNameLoc}</span>
+            <DropdownMenu style={{ marginRight: "11px", borderRadius: "10px" }}>
+              {uidLocOut ? (
+                <div className="userSingIn">
+                  <div className="userSing">
+                    <div className="userImg">
+                      <Person style={{ fontSize: 30 }} />
+                    </div>
+                    <div className="userNameNumber">
+                      <div className="userName">
+                        <span>{userNameLoc}</span>
+                      </div>
+                      <div className="userNumber">
+                        <span>+905345658496</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="userNumber">
-                    <span>+905345658496</span>
-                  </div>
-                </div>
-              </div>
-              <div className="userMore">
-                <ol>
-                  <li>Adreslerim</li>
-                  <li>Favori Ürümlerim</li>
-                  <li>Geçmiş Siparişlerim</li>
-                  <li>Fatura Bilgileri</li>
+                  <div className="userMore">
+                    <ol>
+                      <li>Adreslerim</li>
+                      <li>Favori Ürümlerim</li>
+                      <li>Geçmiş Siparişlerim</li>
+                      <li>Fatura Bilgileri</li>
 
-                  <li onClick={singOutbttnOnClick}>Çıkış Yap</li>
-                </ol>
-              </div>
-            </div>:<div className="userSingOut">
-            <div className="singInbttn" onClick={singInbttnOnClick}>
-            <button>
-            <Link to="/singIn" className="linkSingIn">
-             Giriş Yap
-            </Link>
-            </button>
-           
-           
-            
-            </div>
-            <div className="singUpbttn" >
-            <button>
-            <Link to="/singUp"  className="linksingUp">
-            Üye Ol
-            </Link>
-           
-            </button>
-            
-            </div>
-            
-            </div>
-            }
-              
+                      <li onClick={singOutbttnOnClick}>Çıkış Yap</li>
+                    </ol>
+                  </div>
+                </div>
+              ) : (
+                <div className="userSingOut">
+                  <div className="singInbttn" onClick={singInbttnOnClick}>
+                    <button>
+                      <Link to="/singIn" className="linkSingIn">
+                        Giriş Yap
+                      </Link>
+                    </button>
+                  </div>
+                  <div className="singUpbttn">
+                    <button>
+                      <Link to="/singUp" className="linksingUp">
+                        Üye Ol
+                      </Link>
+                    </button>
+                  </div>
+                </div>
+              )}
             </DropdownMenu>
           </Dropdown>
         </div>
-        
       </div>
     </div>
   );

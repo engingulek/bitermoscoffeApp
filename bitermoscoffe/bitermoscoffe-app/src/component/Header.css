@@ -6,11 +6,11 @@
   background-color: #6f4e37;
   padding: 10px;
   color: white;
-  position: fixed; 
-  width: 100%; 
-  z-index: 1000; 
-  top: 0; 
-  left: 0; 
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  top: 0;
+  left: 0;
 }
 .userIcons {
   display: flex;
@@ -107,7 +107,7 @@
   color: white;
   cursor: pointer;
 }
-.userSingOut{
+.userSingOut {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -115,12 +115,10 @@
   padding-bottom: 15px;
   width: 210px;
   margin-right: 1px;
-  
-  
 }
 
-.singInbttn>button, .singUpbttn>button
-{
+.singInbttn > button,
+.singUpbttn > button {
   outline: none;
   outline-width: none;
   border: none;
@@ -132,25 +130,23 @@
   color: white;
   font-weight: 600;
   border-radius: 10px;
- 
 }
-.singInbttn>button
-{
+.singInbttn > button {
   margin-right: 20px;
 }
 
-.linksingUp{
+.linksingUp {
   color: white;
 }
-.linksingUp:hover{
+.linksingUp:hover {
   text-decoration: none;
   color: white;
 }
 
-.linkSingIn{
+.linkSingIn {
   color: white;
 }
-.linkSingIn:hover{
+.linkSingIn:hover {
   text-decoration: none;
   color: white;
 }
