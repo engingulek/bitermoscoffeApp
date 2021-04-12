@@ -150,3 +150,16 @@
   text-decoration: none;
   color: white;
 }
+
+.headertitleLink{
+  text-decoration: none;
+  color: white;
+  
+
+}
+
+.headertitleLink:hover{
+  text-decoration: none;
+  color: white;
+
+}

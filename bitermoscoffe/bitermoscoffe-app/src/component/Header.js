@@ -13,12 +13,15 @@ import {
   login,
   logout,
   selectUser,
+  cartLogin
 } from "../reduxtoolkit/features/login/loginSlice";
+import { menuSelected } from "../reduxtoolkit/features/menu/menuSlice";
 
 function Header() {
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [userSing, setUserSing] = useState(false);
+ 
 
   const dispatch = useDispatch();
 
@@ -42,6 +45,7 @@ function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const user = useSelector((state) => state.loginRed);
+  const menuSelector = useSelector((state) => state.menuRed);
   const [userLoc, setUserLoc] = useState([]);
   // console.log(user.emailInfo);
   
@@ -89,15 +93,21 @@ function Header() {
     setUserSing(false);
     setDropdownOpen(false);
     dispatch(logout());
+    dispatch(cartLogin())
     localStorage.setItem("uidLocOut", JSON.stringify(null));
     localStorage.setItem("uidLoc", JSON.stringify(null));
   };
+
+  
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   return (
     <div className="header">
       <div className="headerContainer">
-        <div className="headertitle">bitermoscoffe</div>
+      <Link to="/" className="headertitleLink" onClick={()=> dispatch(menuSelected(""))}>
+      <div className="headertitle">bitermoscoffe</div>
+      </Link>
+      
         <div className="headerSearchBar">
           <SearchBar>
             {inputChanges ? (

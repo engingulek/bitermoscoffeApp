@@ -1,25 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import {Link} from "react-router-dom";
+import { useSelector } from "react-redux";
+
+import db from "../firebase";
 function Cart() {
+  const [locId, setlocId] = useState("")
+  const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+  const user = useSelector((state) => state.loginRed);
+ 
+const [cartProductList, setcartProductList] = useState([])
+  useEffect(() => {
+    if (uidLoc!==null) {
+
+      db.collection("personList").doc(uidLoc).collection("cartList").onSnapshot((onSnapshot)=>{
+        const cartItem = [];
+        onSnapshot.forEach((doc)=>{
+          cartItem.push({
+            cartProductId :doc.id,
+            cartProducData:doc.data()
+
+          })
+          
+        })
+        setcartProductList(cartItem)
+      })
+    
+      
+    }
+  
+   
+  }, )
+
+  
+  useEffect(() => {
+    setlocId(uidLoc)
+  }, [locId])
+
+
   return (
     <Wrapper>
-      <CartContainer>
+    {
+      uidLoc===null? 
+      <CartLoginOut>
+      <div>
+      
+      <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
+      
+      
+      </div>
+      </CartLoginOut>
+      :
+      cartProductList.length===0?
+      <div>
+      <span>
+      Sepeteniz Boş
+      </span>
+      </div>:
+      <CartWrapper>
+      {
+        cartProductList.map((item)=>(
+          <CartContainer>
         <ProductCartInfo>
           <div className="productInfo">
             <div className="productName">
-              <span>Filtre Kahve</span>
+              <span>{item.cartProducData.addCartProductName}</span>
             </div>
             <div className="thermosLitre">
-              <span>1 Litre X 1</span>
+              <span>{item.cartProducData.addCartProductKind}  x  {item.cartProducData.addCartProductQuantity}</span>
+            </div>
+            <div className="amount">
+            <span>
+            {item.cartProducData.addCartProductPrice * item.cartProducData.addCartProductQuantity}.00 ₺
+            </span>
+            
             </div>
             <div className="makeTime">
               <div className="totalTime">
-                <span>25 dk</span>
+                <span>{item.cartProducData.addCartProductTime + 15} dk </span>
               </div>
               <div className="deliveryAndMakeTime">
                 <span>
-                  Hazırlanış: 10dk <br />
+                  Hazırlanış: {item.cartProducData.addCartProductTime} <br />
                   Teslimat: 15dk
                 </span>
               </div>
@@ -27,7 +89,7 @@ function Cart() {
           </div>
           <div className="remove">
             <div className="reduce">-</div>
-            <div className="count">1</div>
+            <div className="count">{item.cartProducData.addCartProductQuantity}</div>
 
             <div className="increuce">+</div>
           </div>
@@ -36,38 +98,14 @@ function Cart() {
         
        
       </CartContainer>
-      <CartContainer>
-        <ProductCartInfo>
-          <div className="productInfo">
-            <div className="productName">
-              <span>Ada Çayı</span>
-            </div>
-            <div className="thermosLitre">
-              <span>1.5 Litre X 2</span>
-            </div>
-            <div className="makeTime">
-              <div className="totalTime">
-                <span>30 dk</span>
-              </div>
-              <div className="deliveryAndMakeTime">
-                <span>
-                  Hazırlanış: 20dk <br />
-                  Teslimat: 10dk
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="remove">
-            <div className="reduce">-</div>
-            <div className="count">2</div>
 
-            <div className="increuce">+</div>
-          </div>
           
-        </ProductCartInfo>
-        
-       
-      </CartContainer>
+        ))
+
+
+      }
+      
+     
       <ButtonConfirm>
         <div>
         <Link className="link" to="/cartConfirm">
@@ -78,6 +116,9 @@ function Cart() {
           
           </div>
         </ButtonConfirm>
+        </CartWrapper>
+    }
+      
       
     </Wrapper>
   );
@@ -94,6 +135,25 @@ align-items:center;
   border: 1px solid brown;
   
 `;
+const CartWrapper = styled.div``
+
+const CartLoginOut = styled.div`
+display:flex;
+margin:30px;
+
+div{
+  
+  span{
+   
+    color:red;
+    font-size:20px;
+  }
+}
+
+
+`
+
+
 const CartContainer = styled.div`
   width: 220px;
   border-top: 2px solid brown;
@@ -131,6 +191,19 @@ const ProductCartInfo = styled.div`
         font-weight: 800;
       }
     }
+
+    .amount
+    {
+      margin-top:5px;
+      span{
+        font-size: 20px;
+        color: brown;
+        font-weight: 500;
+
+      }
+    }
+
+    
     .makeTime {
       margin-top: 5px;
       .totalTime {

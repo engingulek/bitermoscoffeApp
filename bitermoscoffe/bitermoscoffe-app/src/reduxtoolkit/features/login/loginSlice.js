@@ -4,6 +4,7 @@ export const slice = createSlice({
   name: "user",
   initialState: {
     userInfo: null,
+    cartLoginInfo:false
   },
   reducers: {
     login: (state, action) => {
@@ -12,10 +13,13 @@ export const slice = createSlice({
     logout: (state) => {
       state.userInfo = null;
     },
+    cartLogin:(state)=>{
+      state.cartLoginInfo=!state.cartLoginInfo
+    }
   },
 });
 
-export const { login, logout, emailSingIn, emailSingOut } = slice.actions;
+export const { login, logout, emailSingIn, emailSingOut,cartLogin } = slice.actions;
 export const selectUser = (state) => state.user.userInfo;
 
 export default slice.reducer;

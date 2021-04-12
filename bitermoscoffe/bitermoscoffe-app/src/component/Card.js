@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import db from "../firebase";
 import alert from "alertifyjs"
+import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 
 function Card() {
   const [menu, setMenu] = useState([]);
   const dispatch = useDispatch();
   const menuSelector = useSelector((state) => state.menuRed);
   console.log(menuSelector.menuInfo.menuTitleId);
+
   
 
   useEffect(() => {
@@ -18,7 +20,11 @@ function Card() {
         .onSnapshot((onSnapshot) => {
           const menuItem = [];
           onSnapshot.forEach((doc) => {
-            menuItem.push(doc.data());
+            menuItem.push({
+              productId:doc.id,
+              productData: doc.data()
+
+            });
           });
           setMenu(menuItem);
         });
@@ -47,25 +53,132 @@ function Card() {
       
     }
     else{
-       db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId).set({
- addCartProductName:addItem.productData.productName,
- addCartProductPrice:addItem.productData.price,
- addCartProductQuantity:addItem.productData.quantity
+//        db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId).set({
+//  addCartProductName:addItem.productData.productName,
+//  addCartProductPrice:addItem.productData.price,
+//  addCartProductQuantity:addItem.productData.quantity,
+//  addCartProductTime:addItem.productData.time,
+//  addCartProductKind:addItem.productData.kind
 
 
-       })
-     .then(() => {
-        alert.success("Siparişiniz Başarıyla eklemiştir")
+
+//        })
+//      .then(() => {
+//         alert.success("Siparişiniz Başarıyla eklemiştir")
+//     })
+//     .catch((error) => {
+//          console.error("Error writing document: ", error);
+//     });
+
+const addCartItems = db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId);
+addCartItems.get().then((doc)=>{
+  if (doc.exists) {
+    addCartItems.update({
+      addCartProductQuantity:doc.data().addCartProductQuantity+1
+
     })
-    .catch((error) => {
-         console.error("Error writing document: ", error);
-    });
-console.log(addItem)
+    
+  }else{
+          db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId).set({
+  addCartProductName:addItem.productData.productName,
+  addCartProductPrice:addItem.productData.price,
+  addCartProductQuantity:addItem.productData.quantity,
+  addCartProductTime:addItem.productData.time,
+  addCartProductKind:addItem.productData.kind
+
+
+
+      })
+     .then(() => {
+         alert.success("Siparişiniz Başarıyla eklemiştir")
+    })
+   .catch((error) => {
+        console.error("Error writing document: ", error);
+   });
+
+  }
+})
+
       
     }
     
 
   }
+
+
+
+  const addProducttoFavoriList = (addItem)=>{
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    if(uidLoc===null)
+    {
+      alert.error("Giriş Yapmadan Favori Ekleme İşlemi Yapamazsınız")
+      
+    }
+    else{        
+//       db.collection("personList").doc(uidLoc).collection("favoriListList").doc(addItem.productId).set({
+//   addFavoriProductName:addItem.productData.productName,
+//  addFavoriProductPrice:addItem.productData.price,
+//   addFavoriProductQuantity:addItem.productData.quantity,
+//  addFavoriProductTime:addItem.productData.time,
+//   addFavoriProductKind:addItem.productData.kind
+
+
+
+//        })
+//      .then(() => {
+//         alert.success("Favorilerinize Başarıyla Eklenmiştir")
+//    })
+//      .catch((error) => {
+//          console.error("Error writing document: ", error);
+//     });
+
+const addFavoriItems = db.collection("personList").doc(uidLoc).collection("favoriList").doc(addItem.productId);
+addFavoriItems.get().then((doc)=>{
+  if (doc.exists) {
+  alert.error("Zaten Favorilerinizde Bulunmaktadır")
+    
+  }else{
+          db.collection("personList").doc(uidLoc).collection("favoriList").doc(addItem.productId).set({
+  addFavoriProductName:addItem.productData.productName,
+  addFavoriProductPrice:addItem.productData.price,
+  addFavoriProductQuantity:addItem.productData.quantity,
+  addFavoriProductTime:addItem.productData.time,
+  addFavoriProductKind:addItem.productData.kind
+
+
+
+      })
+     .then(() => {
+         alert.success("Favorilerinize Başarıyla Eklemiştir")
+    })
+   .catch((error) => {
+        console.error("Error writing document: ", error);
+   });
+
+  }
+})
+
+
+
+      
+    }
+    
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   return (
     <Wrapper>
@@ -80,11 +193,19 @@ console.log(addItem)
             <span>{item.productData.productName}</span>
           </ProductName>
           <ProductType>
-            <span>Taze Öğütülmüş</span>
+<div className="makeTime">
+<span>Hazırlanış Süresi : {item.productData.time}</span>
+</div>
+<div className="favoriIcon" onClick={()=>addProducttoFavoriList(item)}>
+<FavoriteBorderIcon style={{fontSize:"30px",color:"red", }} className="icon"/>
+
+</div>
+            
+
           </ProductType>
           <ProductCount>
             <span>{item.productData.price} ₺</span>
-            <span>(1 litre termos)</span>
+            <span>{item.productData.kind}</span>
           </ProductCount>
           <ProductBttn>
             <div onClick={()=>addProducttoCart(item)}>
@@ -150,12 +271,16 @@ const ProductName = styled.div`
   }
 `;
 const ProductType = styled.div`
+display:flex;
+flex-direction:row;
+justify-content:space-evenly;
+
   padding-top: 10px;
   margin-top: 7px;
   margin-bottom: 7px;
   height: 100%;
   background-color: #91091e;
-
+.makeTime{
   span {
     color: white;
     padding-bottom: 5px;
@@ -165,6 +290,17 @@ const ProductType = styled.div`
     justify-content: center;
     align-items: center;
   }
+
+}
+
+.favoriIcon{
+  display:flex;
+  align-items:center;
+  
+  
+
+}
+  
 `;
 const ProductCount = styled.div`
   span {
