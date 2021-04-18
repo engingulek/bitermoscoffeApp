@@ -68,7 +68,7 @@ function Header() {
   const userEmailLoc = localStorage.getItem("userEmailLoc");
   const uidLocOut = JSON.parse(localStorage.getItem("uidLocOut"));
 
-  console.log(userNameLoc + " " + userEmailLoc + " " + " " + uidLoc);
+
 
   useEffect(() => {
     localStarnge();

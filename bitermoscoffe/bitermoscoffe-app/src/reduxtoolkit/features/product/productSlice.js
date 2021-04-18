@@ -3,22 +3,26 @@ import { createSlice, isAsyncThunkAction } from "@reduxjs/toolkit";
 export const productSlice = createSlice({
   name: "prodcut",
   initialState: {
-    productInfo:[]
+    productInfo:[],
+    cartConfirmCount:0
     
   },
   reducers: {
     productList: (state, action) => {
         state.productInfo.push(action.payload)
-       
-      
-      
-    },
+       },
+
+       cartConfirmCount : (state,action)=>{
+         state.cartConfirmCount = action.payload
+         
+
+       }
  
    
   },
 });
 
-export const { productList} = productSlice.actions;
+export const { productList,cartConfirmCount} = productSlice.actions;
 export const selectProduct = (state) => state.prodcut.productInfo;
 
 

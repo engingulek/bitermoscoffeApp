@@ -7,6 +7,8 @@ import { Link } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import DatePicker from "react-datepicker";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import db from "../firebase";
+import { useDispatch } from "react-redux";
 
 function CartConfirm() {
   const [modal, setModal] = useState(false);
@@ -17,6 +19,11 @@ function CartConfirm() {
   const time = new Date();
   const oorderTime = time.setMinutes(time.getHours() + 60);
   const [date, setDate] = useState(oorderTime);
+  const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+  const [cartConfirm,setCartConfirm] = useState([])
+  const [cartConfirmTime ,setCartConfirmTime] = useState(0)
+  const [cartConfirmPrice,setCaetConfirmPrice]=useState(0)
+
   const a = 0;
   const useStyles = makeStyles((theme) => ({
     container: {
@@ -29,6 +36,8 @@ function CartConfirm() {
       width: 200,
     },
   }));
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     let time = new Date(date);
@@ -48,6 +57,38 @@ function CartConfirm() {
     setOrderTime(hours + ":" + minutes + " " + gunler[day]);
   }, [date]);
 
+  useEffect(() => {
+    db.collection("personList").doc(uidLoc).collection("cartList").onSnapshot((onSnapshot)=>{
+      const cartConfirmItem = [];
+      onSnapshot.forEach((doc)=>{
+        cartConfirmItem.push({
+          cartConfirmProductId :doc.id,
+          cartConfirmProducData:doc.data()
+
+        })
+        
+      })
+      setCartConfirm(cartConfirmItem)
+    })
+  },[])
+ 
+  useEffect(() => {
+    let countPrice=0
+    let countTime=0;
+    
+    cartConfirm.map((item)=>{
+    
+    
+   countPrice+= item.cartConfirmProducData.addCartProductPrice * item.cartConfirmProducData.addCartProductQuantity
+   countTime+=item.cartConfirmProducData.addCartProductTime
+
+    })
+    setCaetConfirmPrice(countPrice)
+    setCartConfirmTime(countTime)
+
+   
+  },)
+
   const timeToggle = () => {
     setTimeModal(!timeModal);
   };
@@ -56,7 +97,41 @@ function CartConfirm() {
     setModal(!modal);
   };
 
-  const classes = useStyles();
+  const cartConfirmClicked = ()=>{
+    setModal(!modal);
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    cartConfirm.map((item)=>(
+      
+      db.collection("personList").doc(uidLoc).collection("cartConfirmList").doc(item.cartConfirmProductId).set({
+      
+
+        cartConfirmListName:item.cartConfirmProducData.addCartProductName,
+        cartConfirmListPrice:item.cartConfirmProducData.addCartProductPrice,
+        cartConfirmListQunatity:item.cartConfirmProducData.addCartProductQuantity,
+        cartConfirmListTime:item.cartConfirmProducData.addCartProductTime
+  
+      })
+
+
+    ))
+
+    
+
+     cartConfirm.map((item)=>(
+       db.collection("personList").doc(uidLoc).collection("cartList").doc(item.cartConfirmProductId).delete().then(()=>{
+         console.log("Success")
+       }).catch((error)=>{
+         console.log(error)
+       })
+
+
+     ))
+
+
+    
+ 
+  }
+
   return (
     <Wrapper>
       <CartConfirmContainer>
@@ -65,7 +140,7 @@ function CartConfirm() {
             <span>bitermoscoffe</span>
           </div>
           <div className="deliveryTimeHeader">
-            <span>10-20dk</span>
+            <span>10-{cartConfirmTime+10}dk</span>
           </div>
         </HeaderContainer>
         <Order>
@@ -115,13 +190,51 @@ function CartConfirm() {
                 <span>Siparişin Teslim Edileceği Adres</span>
               </div>
             </div>
+            <div style={{marginTop:"20px"}}>
+            <span style={{fontSize:"20px",fontWeight:"600"}}>Siparişleriniz</span>
+            </div>
+          
+            <div className="ordersInfo">
+            
+            <div className="ordersTitle">
+            <span>No:</span>
+            <span>Sipariş</span>
+            <span>Fiyat</span>
+            </div>
+            <div className="ordersContainer">
+            {
+              cartConfirm.map((item,index)=>(
+                <div key={index}>
+                <div className="ordersIndex">
+                {index+1}
+                </div>
+                <div className="ordersName">
+                {item.cartConfirmProducData.addCartProductName}
+                </div>
+                <div className="ordersPrice">
+                {item.cartConfirmProducData.addCartProductPrice * item.cartConfirmProducData.addCartProductQuantity}.00 ₺
+                </div>
+                </div>
+
+         
+
+
+              ))
+            }
+         
+            
+           
+            </div>
+
+            
+            </div>
           </OrderUserDec>
         </Order>
         <OrderButton>
           <button onClick={toggle}>
             Sipariş Ver
             <br />
-            60 tl
+           {cartConfirmPrice}.00₺
           </button>
         </OrderButton>
       </CartConfirmContainer>
@@ -141,7 +254,7 @@ function CartConfirm() {
         </ModalBody>
         <ModalFooter>
           <Link to="/">
-            <Button color="danger" onClick={toggle}>
+            <Button color="danger" onClick={cartConfirmClicked}>
               Kapat
             </Button>
           </Link>
@@ -321,6 +434,47 @@ const OrderUserDec = styled.div`
       padding: 10px 20px;
       border-radius: 5px;
     }
+  }
+
+  .ordersInfo{
+    font-size:17px;
+   font-weight:600px;
+    margin-top:10px;
+    width: 100%;
+     
+      border: 2px solid #6f4e37;
+      padding: 10px 20px;
+      border-radius: 5px;
+    .ordersContainer{
+   
+    div{
+      display: flex;
+    flex-direction:row;
+   margin-left:15px;
+   margin-top:7px;
+
+
+    }
+   
+   .ordersName{
+     margin-left:30px;
+   }
+   .ordersPrice{
+     margin-left:25px;
+   }
+
+  }
+
+  
+
+  }
+
+  .ordersTitle{
+    display: flex;
+    flex-direction:row;
+    justify-content:space-around;
+    margin-bottom:10px;
+
   }
 `;
 
