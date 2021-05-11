@@ -12,6 +12,8 @@ export const slice = createSlice({
     },
     logout: (state) => {
       state.userInfo = null;
+      
+      
     },
     cartLogin:(state)=>{
       state.cartLoginInfo=!state.cartLoginInfo

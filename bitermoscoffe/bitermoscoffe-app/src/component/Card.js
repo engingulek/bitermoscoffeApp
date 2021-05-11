@@ -6,169 +6,219 @@ import alert from "alertifyjs";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 
 function Card() {
-  const [menu, setMenu] = useState([]);
-  const dispatch = useDispatch();
+  const [products, setProduct] = useState([]);
+  const [cartConfrim, setCartConfirm] = useState([]);
+  const [cartConfirmListStatu, setCartConfirmListStatu] = useState(false);
   const menuSelector = useSelector((state) => state.menuRed);
-  const productSelector = useSelector((state)=>state.productRed)
+
   useEffect(() => {
     if (menuSelector.menuInfo !== "") {
       db.collection("products")
         .where("bransName", "==", menuSelector.menuInfo.menuTitleId)
         .onSnapshot((onSnapshot) => {
-          const menuItem = [];
+          const productItems = [];
           onSnapshot.forEach((doc) => {
-            menuItem.push({
-              productId: doc.id,
-              productData: doc.data(),
-            });
+            productItems.push(doc);
           });
-          setMenu(menuItem);
+          setProduct(productItems);
         });
     } else {
       db.collection("products").onSnapshot((onSnapshot) => {
-        const menuItem = [];
+        const productItems = [];
         onSnapshot.forEach((doc) => {
-          menuItem.push({
-            productId: doc.id,
-            productData: doc.data(),
-          });
+          productItems.push(doc);
         });
-        setMenu(menuItem);
+        setProduct(productItems);
       });
     }
   }, [menuSelector.menuInfo.menuTitleId]);
+
+  //   useEffect(() => {
+
+  //     db.collection("products").onSnapshot((onSnapshot) => {
+  //     const productItems = []
+  //       onSnapshot.forEach((doc) => {
+  //         productItems.push(doc)
+  //         })
+  //      setProduct(productItems)
+  //     })
+  //  },[] )
+
+  useEffect(() => {
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+
+    if(uidLoc!==null)
+    {
+      db.collection("personList")
+      .doc(uidLoc)
+      .collection("cartConfirmList")
+      .onSnapshot((onSnapshot) => {
+        const cartConfrimListItems = [];
+        onSnapshot.forEach((doc) => {
+          
+            cartConfrimListItems.push(doc);
+           
+          
+        });
+        setCartConfirm(cartConfrimListItems);
+      });
+    }
+    
+
+  }, []);
+
 
 
 
   const addProducttoCart = (addItem) => {
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+
     if (uidLoc === null) {
       alert.error("Giriş Yapmadan Sipariş Veremezsiziniz");
     } 
-    else if (productSelector.cartConfirmCount !== 0){
-      alert.error("Siparişiniz teslim edilmeden başka sipariş veremezsiniz");
+   else if (cartConfrim.length !== 0) {
+      alert.error("Başka Bir Siparişiniz Bulunmaktadır");
+     
     }
     
     else {
-      //        db.collection("personList").doc(uidLoc).collection("cartList").doc(addItem.productId).set({
-      //  addCartProductName:addItem.productData.productName,
-      //  addCartProductPrice:addItem.productData.price,
-      //  addCartProductQuantity:addItem.productData.quantity,
-      //  addCartProductTime:addItem.productData.time,
-      //  addCartProductKind:addItem.productData.kind
-
-      //        })
-      //      .then(() => {
-      //         alert.success("Siparişiniz Başarıyla eklemiştir")
-      //     })
-      //     .catch((error) => {
-      //          console.error("Error writing document: ", error);
-      //     });
-
-      const addCartItems = db
-        .collection("personList")
-        .doc(uidLoc)
-        .collection("cartList")
-        .doc(addItem.productId);
-      addCartItems.get().then((doc) => {
-        if (doc.exists) {
-          addCartItems.update({
-            addCartProductQuantity: doc.data().addCartProductQuantity + 1,
-          });
-        } else {
-          db.collection("personList")
-            .doc(uidLoc)
-            .collection("cartList")
-            .doc(addItem.productId)
-            .set({
-              addCartProductName: addItem.productData.productName,
-              addCartProductPrice: addItem.productData.price,
-              addCartProductQuantity: addItem.productData.quantity,
-              addCartProductTime: addItem.productData.time,
-              addCartProductKind: addItem.productData.kind,
-            })
-            .then(() => {
-              alert.success("Siparişiniz Başarıyla eklemiştir");
-            })
-            .catch((error) => {
-              console.error("Error writing document: ", error);
+       
+        const addCartItems = db
+          .collection("personList")
+          .doc(uidLoc)
+          .collection("cartList")
+          .doc(addItem.id);
+        addCartItems.get().then((doc) => {
+          if (doc.exists) {
+            addCartItems.update({
+              addCartProductQuantity: doc.data().addCartProductQuantity + 1,
             });
-        }
-      });
+            alert.success("Siparişiniz Tekrar eklemiştir");
+          } else {
+            db.collection("personList")
+              .doc(uidLoc)
+              .collection("cartList")
+              .doc(addItem.id)
+              .set({
+                addCartProductName: addItem.data().productName,
+                addCartProductPrice: addItem.data().price,
+                addCartProductQuantity: addItem.data().quantity,
+                addCartProductTime: addItem.data().time,
+                addCartProductKind: addItem.data().kind,
+              })
+              .then(() => {
+                alert.success("Siparişiniz Başarıyla eklemiştir");
+              })
+              .catch((error) => {
+                console.error("Error writing document: ", error);
+              });
+          }
+        });
+      
+
+  
     }
   };
 
-  const addProducttoFavoriList = (addItem) => {
+  // const addProducttoCart = (addItem) => {
+
+  //   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+
+  //   if (uidLoc===null)
+  //   {
+  //     alert.error("Giriş Yapmadan Sipariş Veremezsiziniz");
+  //   }
+
+  // else{
+  //   const addCartItems = db.collection("personList").doc(uidLoc)
+  //   .collection("cartList").doc(addItem.id);
+  //   addCartItems.get().then((doc)=>{
+  //     if(doc.exists){
+  //       addCartItems.update({
+  //         addCartProductQuantity: doc.data().addCartProductQuantity + 1,
+  //       });
+
+  //     }else{
+  //       db.collection("personList")
+  //       .doc(uidLoc)
+  //       .collection("cartList")
+  //       .doc(addItem.id)
+  //       .set({
+  //         addCartProductName: addItem.data().productName,
+  //         addCartProductPrice: addItem.data().price,
+  //         addCartProductQuantity: addItem.data().quantity,
+  //         addCartProductTime: addItem.data().time,
+  //         addCartProductKind: addItem.data().kind,
+  //       })
+  //       .then(() => {
+  //         alert.success("Siparişiniz Başarıyla eklemiştir");
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error writing document: ", error);
+  //       });
+  //     }
+  //   })
+  // }
+  // };
+
+
+  const addFavoriList = (addItem)=>{
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     if (uidLoc === null) {
-      alert.error("Giriş Yapmadan Favori Ekleme İşlemi Yapamazsınız");
-    } else {
-      //       db.collection("personList").doc(uidLoc).collection("favoriListList").doc(addItem.productId).set({
-      //   addFavoriProductName:addItem.productData.productName,
-      //  addFavoriProductPrice:addItem.productData.price,
-      //   addFavoriProductQuantity:addItem.productData.quantity,
-      //  addFavoriProductTime:addItem.productData.time,
-      //   addFavoriProductKind:addItem.productData.kind
+      alert.error("Giriş Yapmadan Sipariş Veremezsiziniz");
+    } 
+    else{
+      const addCartItems = db
+          .collection("personList")
+          .doc(uidLoc)
+          .collection("favoriList")
+          .doc(addItem.id);
+        addCartItems.get().then((doc) => {
+          if (doc.exists) {
+         
+            alert.warning("Zaten Favori Listenizde Bulunmaktadır.");
+          } else {
+            db.collection("personList")
+              .doc(uidLoc)
+              .collection("favoriList")
+              .doc(addItem.id)
+              .set({
+                addCartProductName: addItem.data().productName,
+                addCartProductPrice: addItem.data().price,
+                addCartProductQuantity: addItem.data().quantity,
+                addCartProductTime: addItem.data().time,
+                addCartProductKind: addItem.data().kind,
+              })
+              .then(() => {
+                alert.success("Ürün FavoriListe Eklendi");
+              })
+              .catch((error) => {
+                console.error("Error writing document: ", error);
+              });
+          }
+        });
 
-      //        })
-      //      .then(() => {
-      //         alert.success("Favorilerinize Başarıyla Eklenmiştir")
-      //    })
-      //      .catch((error) => {
-      //          console.error("Error writing document: ", error);
-      //     });
-
-      const addFavoriItems = db
-        .collection("personList")
-        .doc(uidLoc)
-        .collection("favoriList")
-        .doc(addItem.productId);
-      addFavoriItems.get().then((doc) => {
-        if (doc.exists) {
-          alert.error("Zaten Favorilerinizde Bulunmaktadır");
-        } else {
-          db.collection("personList")
-            .doc(uidLoc)
-            .collection("favoriList")
-            .doc(addItem.productId)
-            .set({
-              addFavoriProductName: addItem.productData.productName,
-              addFavoriProductPrice: addItem.productData.price,
-              addFavoriProductQuantity: addItem.productData.quantity,
-              addFavoriProductTime: addItem.productData.time,
-              addFavoriProductKind: addItem.productData.kind,
-            })
-            .then(() => {
-              alert.success("Favorilerinize Başarıyla Eklemiştir");
-            })
-            .catch((error) => {
-              console.error("Error writing document: ", error);
-            });
-        }
-      });
     }
-  };
+    
+  }
 
   return (
     <Wrapper>
-      {menu.map((item) => (
+      {products.map((item) => (
         <CardContainer>
           <ProductImg>
             <div>
-              <img src={item.productData.img} alt="kahve" />
+              <img src={item.data().img} alt="kahve" />
             </div>
           </ProductImg>
           <ProductName>
-            <span>{item.productData.productName}</span>
+            <span>{item.data().productName}</span>
           </ProductName>
           <ProductType>
             <div className="makeTime">
-              <span>Hazırlanış Süresi : {item.productData.time}</span>
+              <span>Hazırlanış Süresi : {item.data().time}</span>
             </div>
-            <div
-              className="favoriIcon"
-              onClick={() => addProducttoFavoriList(item)}
-            >
+            <div className="favoriIcon" onClick={()=>addFavoriList(item)}>
               <FavoriteBorderIcon
                 style={{ fontSize: "30px", color: "red" }}
                 className="icon"
@@ -176,8 +226,8 @@ function Card() {
             </div>
           </ProductType>
           <ProductCount>
-            <span>{item.productData.price} ₺</span>
-            <span>{item.productData.kind}</span>
+            <span>{item.data().price} ₺</span>
+            <span>{item.data().kind}</span>
           </ProductCount>
           <ProductBttn>
             <div onClick={() => addProducttoCart(item)}>

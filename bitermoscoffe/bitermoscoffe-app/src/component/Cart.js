@@ -5,16 +5,27 @@ import { useDispatch, useSelector } from "react-redux";
 
 import db from "../firebase";
 import StepContainer from "./StepContainer";
-import { cartConfirmCount } from "../reduxtoolkit/features/product/productSlice";
+
 function Cart() {
   const [locId, setlocId] = useState("");
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-  const user = useSelector((state) => state.loginRed);
-  const [cartListConfirm,setCartListConfirm]= useState([])
-const dispatch = useDispatch()
+
+   const [cartListConfirm, setCartListConfirm] = useState([]);
+  const dispatch = useDispatch();
   const [cartProductList, setcartProductList] = useState([]);
-  const [price,setPrice] = useState(0)
+  const [cartConfirmPrice, setCartConfirmPrice] = useState(0)
+  const [cartConfirmTime, setCartConfirmTime] = useState(0)
+  // const [price, setPrice] = useState(0);
+
+   const loginSelector = useSelector(state => state.loginRed)
+
+  // useEffect(() => {
+  //   console.log(loginSelector.userInfo)
+  // }, [])
+  
+
   useEffect(() => {
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     if (uidLoc !== null) {
       db.collection("personList")
         .doc(uidLoc)
@@ -22,15 +33,12 @@ const dispatch = useDispatch()
         .onSnapshot((onSnapshot) => {
           const cartItem = [];
           onSnapshot.forEach((doc) => {
-            cartItem.push({
-              cartProductId: doc.id,
-              cartProducData: doc.data(),
-            });
+            cartItem.push(doc);
           });
           setcartProductList(cartItem);
         });
     }
-  });
+  },[]);
 
   useEffect(() => {
     setlocId(uidLoc);
@@ -38,216 +46,177 @@ const dispatch = useDispatch()
 
 
   useEffect(() => {
-    db.collection("personList")
-        .doc(uidLoc)
-        .collection("cartConfirmList")
-        .onSnapshot((onSnapshot) => {
-          const cartListConfirmItem = [];
-          onSnapshot.forEach((doc) => {
-            cartListConfirmItem.push({
-              cartConfirmProductId: doc.id,
-              cartProducConfirmData: doc.data(),
-            });
-          });
-          setCartListConfirm(cartListConfirmItem);
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    if(uidLoc !== null)
+    {
+      db.collection("personList")
+      .doc(uidLoc)
+      .collection("cartConfirmList")
+      .onSnapshot((onSnapshot) => {
+        const cartConfrimListItems = [];
+        onSnapshot.forEach((doc) => {
+          
+            cartConfrimListItems.push(doc);
+           
+          
         });
-       
+        setCartListConfirm(cartConfrimListItems);
+      });
+    }
+   
+
+  },[]);
 
 
 
-      
-      
+  useEffect(() => {
+    let countPrice = 0;
+    let countTime = 0;
+
+    cartListConfirm.map((item) => {
+      countPrice +=
+        item.data().cartConfirmListPrice *
+        item.data().cartConfirmListQunatity;
+      countTime += item.data().cartConfirmListTime;
+    });
+    setCartConfirmPrice(countPrice);
     
-  },)
-  dispatch(cartConfirmCount(cartListConfirm.length))
-
-useEffect(() => {
-  let countprice =0
-
-  cartListConfirm.map((item)=>{
-    countprice +=item.cartProducConfirmData.cartConfirmListPrice*item.cartProducConfirmData.cartConfirmListQunatity
-  })
-  setPrice(countprice)
-}, )
-  
+    
+    setCartConfirmTime(countTime);
+  },[cartListConfirm]);
 
   return (
     <Wrapper>
     <Container>
-    {uidLoc === null ? (
-      <CartLoginOut>
-        <div>
-          <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
-        </div>
-      </CartLoginOut>
-    ) : cartProductList.length === 0  ? (
+     
+    {uidLoc === null?<CartLoginOut>
       <div>
-        <span>Sepeteniz Boş</span>
+        <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
       </div>
-    ) : (
-      <CartWrapper>
-        {cartProductList.map((item) => (
-          <CartContainer>
-            <ProductCartInfo>
-              <div className="productInfo">
-                <div className="productName">
-                  <span>{item.cartProducData.addCartProductName}</span>
-                </div>
-                <div className="thermosLitre">
-                  <span>
-                    {item.cartProducData.addCartProductKind} x{" "}
-                    {item.cartProducData.addCartProductQuantity}
-                  </span>
-                </div>
-                <div className="amount">
-                  <span>
-                    {item.cartProducData.addCartProductPrice *
-                      item.cartProducData.addCartProductQuantity}
-                    .00 ₺
-                  </span>
-                </div>
-                <div className="makeTime">
-                  <div className="totalTime">
-                    <span>
-                      {item.cartProducData.addCartProductTime + 15} dk{" "}
-                    </span>
-                  </div>
-                  <div className="deliveryAndMakeTime">
-                    <span>
-                      Hazırlanış: {item.cartProducData.addCartProductTime}{" "}
-                      <br />
-                      Teslimat: 15dk
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="remove">
-                <div className="reduce">-</div>
-                <div className="count">
-                  {item.cartProducData.addCartProductQuantity}
-                </div>
-
-                <div className="increuce">+</div>
-              </div>
-            </ProductCartInfo>
-          </CartContainer>
-        ))}
-
-        <ButtonConfirm>
-          <div>
-            <Link className="link" to="/cartConfirm">
-              <button>Sepeti Onayla</button>
-            </Link>
-          </div>
-        </ButtonConfirm>
-      </CartWrapper>
-    )}
-   
-
-    </Container>
-    <StepCartContainer>
-    <span style={{color:"red",fontSize:"20px",marginTop:"20px"}}>Siparişleriniz</span>
-    <div className="ordersList">
-
-    {
-      cartListConfirm.length!==0&& cartProductList.length === 0?
-      <div >
-      {
-        cartListConfirm.map((item)=>(
-          
-          <div className="ordersPro">
-          <div>
-          <span>
-          {item.cartProducConfirmData.cartConfirmListName} 
-          </span>
-          </div>
-          <div>
-          Adet:{item.cartProducConfirmData.cartConfirmListQunatity}
-          </div>
-          
-          </div>
-        ))
-      }
-      <div className="price">
-      {price}.00₺
-      </div>
-      
-      </div>
-      
-       
-       
-      
-
-        
-      :
-      false
-    }
-    
+    </CartLoginOut>:
+    cartProductList.length===0&&cartListConfirm.length===0 && uidLoc!==null?
+    <div className="cartListEmpty">
+    <div>
+    <span>Sepeteniz</span>
     </div>
     <div>
-
-    {
-      cartListConfirm.length!==0&& cartProductList.length === 0?
-      <StepContainer/>:false
-
-
-    }
-    
+    <span>Boş</span>
     </div>
-   
+          
+         
+        </div>
+        :
+        cartListConfirm.length===0?
+        <CartWrapper>
+        
+          {cartProductList.map((item) => (
+            <CartContainer>
+              <ProductCartInfo>
+                <div className="productInfo">
+                  <div className="productName">
+                    <span>{item.data().addCartProductName}</span>
+                  </div>
+                  <div className="thermosLitre">
+                    <span>
+                      {item.data().addCartProductKind} x{" "}
+                      {item.data().addCartProductQuantity}
+                    </span>
+                  </div>
+                  <div className="amount">
+                    <span>
+                      {item.data().addCartProductPrice *
+                        item.data().addCartProductQuantity}
+                      .00 ₺
+                    </span>
+                  </div>
+                  <div className="makeTime">
+                    <div className="totalTime">
+                      <span>
+                        {item.data().addCartProductTime + 15} dk{" "}
+                      </span>
+                    </div>
+                    <div className="deliveryAndMakeTime">
+                      <span>
+                        Hazırlanış: {item.data().addCartProductTime}{" "}
+                        <br />
+                        Teslimat: 15dk
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="remove">
+                  <div className="reduce">-</div>
+                  <div className="count">
+                    {item.data().addCartProductQuantity}
+                  </div>
 
-    
+                  <div className="increuce">+</div>
+                </div>
+              </ProductCartInfo>
+            </CartContainer>
+          ))}
 
-    
-   
-    </StepCartContainer>
+          <ButtonConfirm>
+          <Link className="link" to="/cartConfirm">
+            <div>
+              
+                <button>Sepeti Onayla</button>
+             
+            </div>
+            </Link>
+          </ButtonConfirm>
+        </CartWrapper>:
+        <div className="cartConfirm">
+        <div className="cartConfirmTitle">
+        <span>
+        Sipariş Verdiğinz Ürünler
+        </span>
+        </div>
+       
+        {cartListConfirm.map((item)=>(
+          <div className="cartConfirmDesc">
+          <span>{item.data().cartConfirmListName} x {item.data().cartConfirmListQunatity}</span>
+          </div>
+          
+        ))}
+        <div className="line"/>
+        <div className="cartConfirmDesc">
+        <span style={{color:"black"}}>
+        Sipariş Toplamı :  {cartConfirmPrice}
+        </span>
      
+        </div>
+        
+        <div className="cartConfirmDesc">
+        <span style={{color:"black"}}>
+        Teslim Süresi : {cartConfirmTime}
+        </span>
+      
+        </div>
+       
+        
+        
 
+        <StepContainer />
+        </div>
+      
+    
+        
+        }
+
+
+     
+    </Container>
     </Wrapper>
   );
-}
 
- // {
-    //   cartListConfirm.length!==0 && cartProductList.length === 0 ? <StepContainer/>:false
-    // }
-const Wrapper = styled.div`
-
-`;
-
-const StepCartContainer = styled.div`
-display:flex;
-flex-direction:column;
-align-items:center;
-border: 1px solid brown;
-border-radius: 10px;
-
-.ordersList{
   
-  margin-top:20px;
-  margin-bottom:20px;
-  div{
-    display:flex;
-  flex-direction:column;
-  align-items:center;
-  .ordersPro{
-    margin-bottom:15px;
-    font-size:17px;
-    font-weight:600;
-  }
-  .price{
-    border: 1px solid brown;
-    padding:10px 20px;
-    border-radius:10px;
-    background-color:brown;
-    color:white;
-    font-size:20px;
-    font-weight:600;
-  }
-
-  }
 }
 
-`
+
+const Wrapper = styled.div``;
+
+
 
 const Container = styled.div`
   display: flex;
@@ -255,11 +224,58 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   margin-right: 20px;
-  margin-left: 10px;
+  margin-left: 15px;
   border-radius: 10px;
   border: 1px solid brown;
+  .cartListEmpty{
+       color:red;
+       display:flex;
+       margin:30px;
+       flex-direction:column;
+       align-items:center;
+         justify-content:center;
+         font-size: 20px;
+      
+       
+     }
+   
+  .cartConfirm{
+    display:flex;
+     flex-direction:column;
+     align-items:center;
+     justify-content:center;
+     cursor: default;
+    .cartConfirmTitle{
+       margin-top:10px;
+       margin-bottom:20px;
+       font-size:17px;
+       font-weight:bold;
+      
+     }
 
-`
+     .line{
+       border:1px solid brown;
+       width:100%;
+       height:6px;
+       background-color:brown;
+       margin-bottom:10px;
+       border-radius:100px;
+     }
+
+     .cartConfirmDesc{
+       font-size:17px;
+       font-weight:bold;
+       color:brown;
+       margin-bottom:10px;
+      
+     }
+    
+
+     
+    
+  
+  }
+`;
 const CartWrapper = styled.div``;
 
 const CartLoginOut = styled.div`

@@ -9,6 +9,7 @@ export const menuSlice = createSlice({
   reducers: {
     menuSelected: (state, action) => {
         state.menuInfo=action.payload
+        
        
       
       

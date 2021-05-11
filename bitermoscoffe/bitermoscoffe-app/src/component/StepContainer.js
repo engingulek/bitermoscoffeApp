@@ -4,19 +4,19 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 
 function getSteps() {
-  return ['Hazırlanıyor', 'Yolda', 'Teslim Edildi'];
+  return ['Hazırlanıyor', 'Dağıtımda', 'Teslim Edildi'];
 }
 export default function StepContainer() {
   const steps = getSteps();
   return (
-    <div >
-      <Stepper >
+    <div  >
+      <Stepper style={{display:'flex',flexDirection:'column', alignItems:'center'}} >
         {steps.map((label) => {
           const stepProps = {};
           const labelProps = {};
           return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
+            <Step  key={label} {...stepProps}>
+              <StepLabel  {...labelProps}>{label}</StepLabel>
             </Step>
           );
         })}

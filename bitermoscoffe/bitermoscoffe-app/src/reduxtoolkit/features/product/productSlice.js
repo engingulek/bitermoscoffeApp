@@ -4,7 +4,8 @@ export const productSlice = createSlice({
   name: "prodcut",
   initialState: {
     productInfo:[],
-    cartConfirmCount:0
+    cartConfirmCount:0,
+    cartConfirmPriceA:12
     
   },
   reducers: {
@@ -16,8 +17,8 @@ export const productSlice = createSlice({
          state.cartConfirmCount = action.payload
          
 
-       }
- 
+       },
+   
    
   },
 });

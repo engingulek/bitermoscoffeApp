@@ -1,0 +1,47 @@
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid lightgray;
+    width: 700px;
+    margin-left: 420px;
+    border-radius: 10px;
+   
+    
+}
+
+.container{
+    
+    
+   
+}
+
+.pageTitle{
+    color :brown;
+    font-size: 40px;
+    font-weight: bold;
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.content{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.content>header{
+    font-size: 25px;
+    margin-top: 10px;
+    color: orange;
+    font-weight: bold;
+    
+}
+
+.content>p{
+    font-size: 15px;
+    margin-left: 10px;
+}
+

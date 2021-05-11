@@ -96,6 +96,8 @@ function Header() {
     dispatch(cartLogin())
     localStorage.setItem("uidLocOut", JSON.stringify(null));
     localStorage.setItem("uidLoc", JSON.stringify(null));
+    
+    
   };
 
   

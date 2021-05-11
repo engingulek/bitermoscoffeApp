@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { menuSelected } from "../reduxtoolkit/features/menu/menuSlice";
 function Menu() {
   const [menu, setMenu] = useState([]);
-  const dispatch = useDispatch()
+   const dispatch = useDispatch()
 
   useEffect(() => {
     db.collection("menuList").onSnapshot((onSnapshot) => {
@@ -17,7 +17,7 @@ function Menu() {
         
         });
         
-      });
+      },[]);
       setMenu(menuItem);
 
 
@@ -34,7 +34,7 @@ function Menu() {
 
 const menuClicked=(menuItems)=>{
   
- dispatch(menuSelected(menuItems))
+  dispatch(menuSelected(menuItems))
 
 }
   return (

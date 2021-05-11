@@ -9,6 +9,8 @@ import DatePicker from "react-datepicker";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import db from "../firebase";
 import { useDispatch } from "react-redux";
+import axios from "axios";
+
 
 function CartConfirm() {
   const [modal, setModal] = useState(false);
@@ -20,9 +22,9 @@ function CartConfirm() {
   const oorderTime = time.setMinutes(time.getHours() + 60);
   const [date, setDate] = useState(oorderTime);
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-  const [cartConfirm,setCartConfirm] = useState([])
-  const [cartConfirmTime ,setCartConfirmTime] = useState(0)
-  const [cartConfirmPrice,setCaetConfirmPrice]=useState(0)
+  const [cartConfirm, setCartConfirm] = useState([]);
+  const [cartConfirmTime, setCartConfirmTime] = useState(0);
+  const [cartConfirmPrice, setCaetConfirmPrice] = useState(0);
 
   const a = 0;
   const useStyles = makeStyles((theme) => ({
@@ -37,7 +39,7 @@ function CartConfirm() {
     },
   }));
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     let time = new Date(date);
@@ -58,36 +60,41 @@ function CartConfirm() {
   }, [date]);
 
   useEffect(() => {
-    db.collection("personList").doc(uidLoc).collection("cartList").onSnapshot((onSnapshot)=>{
-      const cartConfirmItem = [];
-      onSnapshot.forEach((doc)=>{
-        cartConfirmItem.push({
-          cartConfirmProductId :doc.id,
-          cartConfirmProducData:doc.data()
+    db.collection("personList")
+      .doc(uidLoc)
+      .collection("cartList")
+      .onSnapshot((onSnapshot) => {
+        const cartConfirmItem = [];
+        const cartConfirmItemPrice =0;
+        onSnapshot.forEach((doc) => {
+          cartConfirmItem.push({
+            cartConfirmProductId: doc.id,
+            cartConfirmProducData: doc.data(),
+          });
+          
+        });
+        setCartConfirm(cartConfirmItem);
+       
+      });
+      
+  }, []);
 
-        })
-        
-      })
-      setCartConfirm(cartConfirmItem)
-    })
-  },[])
- 
   useEffect(() => {
-    let countPrice=0
-    let countTime=0;
-    
-    cartConfirm.map((item)=>{
-    
-    
-   countPrice+= item.cartConfirmProducData.addCartProductPrice * item.cartConfirmProducData.addCartProductQuantity
-   countTime+=item.cartConfirmProducData.addCartProductTime
+    let countPrice = 0;
+    let countTime = 0;
 
-    })
-    setCaetConfirmPrice(countPrice)
-    setCartConfirmTime(countTime)
-
-   
-  },)
+    cartConfirm.map((item) => {
+      countPrice +=
+        item.cartConfirmProducData.addCartProductPrice *
+        item.cartConfirmProducData.addCartProductQuantity;
+      countTime += item.cartConfirmProducData.addCartProductTime;
+    });
+    setCaetConfirmPrice(countPrice);
+    // console.log(countPrice)
+    // console.log(countTime)
+    
+    setCartConfirmTime(countTime);
+  },);
 
   const timeToggle = () => {
     setTimeModal(!timeModal);
@@ -96,41 +103,74 @@ function CartConfirm() {
   const toggle = () => {
     setModal(!modal);
   };
+  
 
-  const cartConfirmClicked = ()=>{
-    setModal(!modal);
-    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+  const orderClicled = () => {
+    const email = JSON.parse(localStorage.getItem("userEmailLoc"));
+    const userInfoServer = {
+      email: email,
+      summary: [],
+      price:cartConfirmPrice,
+      time:cartConfirmTime
+
+    };
+   
+    // console.log(cartConfirm)
     cartConfirm.map((item)=>(
-      
-      db.collection("personList").doc(uidLoc).collection("cartConfirmList").doc(item.cartConfirmProductId).set({
-      
-
-        cartConfirmListName:item.cartConfirmProducData.addCartProductName,
-        cartConfirmListPrice:item.cartConfirmProducData.addCartProductPrice,
-        cartConfirmListQunatity:item.cartConfirmProducData.addCartProductQuantity,
-        cartConfirmListTime:item.cartConfirmProducData.addCartProductTime
+      userInfoServer.summary.push({
+        name:"İsim: "+item.cartConfirmProducData.addCartProductName,
+        quantity:"Adet: "+item.cartConfirmProducData.addCartProductQuantity
   
       })
 
-
     ))
-
     
 
-     cartConfirm.map((item)=>(
-       db.collection("personList").doc(uidLoc).collection("cartList").doc(item.cartConfirmProductId).delete().then(()=>{
-         console.log("Success")
-       }).catch((error)=>{
-         console.log(error)
-       })
+   
 
+    axios
+      .post("http://localhost:3005/create",userInfoServer)
+      .then(() => console.log("Book Created"))
+      .catch((err) => {
+        console.error(err);
+      });
 
-     ))
+    setModal(!modal);
+  };
 
+  const cartConfirmClicked = () => {
+    setModal(!modal);
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    cartConfirm.map((item) =>
+      db
+        .collection("personList")
+        .doc(uidLoc)
+        .collection("cartConfirmList")
+        .doc(item.cartConfirmProductId)
+        .set({
+          cartConfirmListName: item.cartConfirmProducData.addCartProductName,
+          cartConfirmListPrice: item.cartConfirmProducData.addCartProductPrice,
+          cartConfirmListQunatity:
+            item.cartConfirmProducData.addCartProductQuantity,
+          cartConfirmListTime: item.cartConfirmProducData.addCartProductTime,
+        })
+    );
 
-    
- 
-  }
+    cartConfirm.map((item) =>
+      db
+        .collection("personList")
+        .doc(uidLoc)
+        .collection("cartList")
+        .doc(item.cartConfirmProductId)
+        .delete()
+        .then(() => {
+          // console.log("Success");
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+    );
+  };
 
   return (
     <Wrapper>
@@ -140,7 +180,7 @@ function CartConfirm() {
             <span>bitermoscoffe</span>
           </div>
           <div className="deliveryTimeHeader">
-            <span>10-{cartConfirmTime+10}dk</span>
+            <span>10-{cartConfirmTime + 10}dk</span>
           </div>
         </HeaderContainer>
         <Order>
@@ -190,51 +230,41 @@ function CartConfirm() {
                 <span>Siparişin Teslim Edileceği Adres</span>
               </div>
             </div>
-            <div style={{marginTop:"20px"}}>
-            <span style={{fontSize:"20px",fontWeight:"600"}}>Siparişleriniz</span>
+            <div style={{ marginTop: "20px" }}>
+              <span style={{ fontSize: "20px", fontWeight: "600" }}>
+                Siparişleriniz
+              </span>
             </div>
-          
+
             <div className="ordersInfo">
-            
-            <div className="ordersTitle">
-            <span>No:</span>
-            <span>Sipariş</span>
-            <span>Fiyat</span>
-            </div>
-            <div className="ordersContainer">
-            {
-              cartConfirm.map((item,index)=>(
-                <div key={index}>
-                <div className="ordersIndex">
-                {index+1}
-                </div>
-                <div className="ordersName">
-                {item.cartConfirmProducData.addCartProductName}
-                </div>
-                <div className="ordersPrice">
-                {item.cartConfirmProducData.addCartProductPrice * item.cartConfirmProducData.addCartProductQuantity}.00 ₺
-                </div>
-                </div>
-
-         
-
-
-              ))
-            }
-         
-            
-           
-            </div>
-
-            
+              <div className="ordersTitle">
+                <span>No:</span>
+                <span>Sipariş</span>
+                <span>Fiyat</span>
+              </div>
+              <div className="ordersContainer">
+                {cartConfirm.map((item, index) => (
+                  <div key={index}>
+                    <div className="ordersIndex">{index + 1}</div>
+                    <div className="ordersName">
+                      {item.cartConfirmProducData.addCartProductName}
+                    </div>
+                    <div className="ordersPrice">
+                      {item.cartConfirmProducData.addCartProductPrice *
+                        item.cartConfirmProducData.addCartProductQuantity}
+                      .00 ₺
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </OrderUserDec>
         </Order>
         <OrderButton>
-          <button onClick={toggle}>
+          <button onClick={orderClicled}>
             Sipariş Ver
             <br />
-           {cartConfirmPrice}.00₺
+            {cartConfirmPrice}.00₺
           </button>
         </OrderButton>
       </CartConfirmContainer>
@@ -436,45 +466,37 @@ const OrderUserDec = styled.div`
     }
   }
 
-  .ordersInfo{
-    font-size:17px;
-   font-weight:600px;
-    margin-top:10px;
+  .ordersInfo {
+    font-size: 17px;
+    font-weight: 600px;
+    margin-top: 10px;
     width: 100%;
-     
-      border: 2px solid #6f4e37;
-      padding: 10px 20px;
-      border-radius: 5px;
-    .ordersContainer{
-   
-    div{
-      display: flex;
-    flex-direction:row;
-   margin-left:15px;
-   margin-top:7px;
 
+    border: 2px solid #6f4e37;
+    padding: 10px 20px;
+    border-radius: 5px;
+    .ordersContainer {
+      div {
+        display: flex;
+        flex-direction: row;
+        margin-left: 15px;
+        margin-top: 7px;
+      }
 
+      .ordersName {
+        margin-left: 30px;
+      }
+      .ordersPrice {
+        margin-left: 25px;
+      }
     }
-   
-   .ordersName{
-     margin-left:30px;
-   }
-   .ordersPrice{
-     margin-left:25px;
-   }
-
   }
 
-  
-
-  }
-
-  .ordersTitle{
+  .ordersTitle {
     display: flex;
-    flex-direction:row;
-    justify-content:space-around;
-    margin-bottom:10px;
-
+    flex-direction: row;
+    justify-content: space-around;
+    margin-bottom: 10px;
   }
 `;
 
