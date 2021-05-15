@@ -8,6 +8,9 @@ import SingIn from "./component/SingIn";
 import Cart from "./component/Cart";
 import CartConfirm from "./component/CartConfirm";
 import db from "./firebase";
+import FavoriList from "./component/FavoriList";
+import MyAcount from "./component/MyAcount";
+import PastOrder from "./component/PastOrder";
 
 function App() {
   return (
@@ -23,12 +26,14 @@ function App() {
                 <Menu />
               </div>
               <div className="cardAndCart">
+            
                 <div className="cardDesign">
                   <Card />
                 </div>
                 <div className="cart">
-                  <Cart />
-                </div>
+                <Cart />
+              </div>
+               
               </div>
             </div>
           </Route>
@@ -40,6 +45,15 @@ function App() {
           </Route>
           <Route path="/cartConfirm">
             <CartConfirm />
+          </Route>
+          <Route path="/favoriList">
+          <FavoriList/>
+          </Route>
+          <Route path="/myAcount">
+          <MyAcount/>
+          </Route>
+          <Route path="/pastOrder">
+          <PastOrder/>
           </Route>
         </Switch>
       </BrowserRouter>

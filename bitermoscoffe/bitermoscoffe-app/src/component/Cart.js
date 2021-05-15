@@ -5,11 +5,12 @@ import { useDispatch, useSelector } from "react-redux";
 
 import db from "../firebase";
 import StepContainer from "./StepContainer";
+import { cartConfirmHiddle } from "../reduxtoolkit/features/product/productSlice";
 
 function Cart() {
   const [locId, setlocId] = useState("");
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-
+  const cartSelector = useSelector((state) => state.productRed);
    const [cartListConfirm, setCartListConfirm] = useState([]);
   const dispatch = useDispatch();
   const [cartProductList, setcartProductList] = useState([]);
@@ -18,10 +19,10 @@ function Cart() {
   // const [price, setPrice] = useState(0);
 
    const loginSelector = useSelector(state => state.loginRed)
+   
+ 
 
-  // useEffect(() => {
-  //   console.log(loginSelector.userInfo)
-  // }, [])
+ 
   
 
   useEffect(() => {
@@ -67,6 +68,45 @@ function Cart() {
 
   },[]);
 
+  useEffect(() => {
+    if (cartSelector.cartConfirmHid === false) {
+      console.log("B");
+
+      const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+      cartListConfirm.map((item) =>
+        db
+          .collection("personList")
+          .doc(uidLoc)
+          .collection("pastOrderList")
+          .doc(item.id)
+          .set({
+            cartPastOrderListName: item.data().cartConfirmListName,
+            cartPastOrderListPrice: item.data().cartConfirmListPrice,
+            cartPastOrderListQunatity: item.data().cartConfirmListQunatity,
+            cartPastOrderListTime: item.data().cartConfirmListTime,
+          })
+      );
+
+      cartListConfirm.map((item) =>
+        db
+          .collection("personList")
+          .doc(uidLoc)
+          .collection("cartConfirmList")
+          .doc(item.id)
+          .delete()
+          .then(() => {
+            // console.log("Success");
+          })
+          .catch((error) => {
+            console.log(error);
+          })
+      );
+    }
+    
+  }, [cartSelector.cartConfirmHid]);
+
+
+
 
 
   useEffect(() => {
@@ -94,7 +134,9 @@ function Cart() {
         <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
       </div>
     </CartLoginOut>:
-    cartProductList.length===0&&cartListConfirm.length===0 && uidLoc!==null?
+    cartProductList.length===0&&cartListConfirm.length===0 && uidLoc!==null
+
+    ?
     <div className="cartListEmpty">
     <div>
     <span>Sepeteniz</span>
@@ -159,9 +201,7 @@ function Cart() {
           <ButtonConfirm>
           <Link className="link" to="/cartConfirm">
             <div>
-              
                 <button>Sepeti Onayla</button>
-             
             </div>
             </Link>
           </ButtonConfirm>
@@ -191,12 +231,7 @@ function Cart() {
         <span style={{color:"black"}}>
         Teslim Süresi : {cartConfirmTime}
         </span>
-      
         </div>
-       
-        
-        
-
         <StepContainer />
         </div>
       

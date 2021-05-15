@@ -1,5 +1,5 @@
-.navbar span {
-  float: left;
+/* .navbar span {
+  
   font-size: 20px;
   color: black;
   font-weight: bold;
@@ -8,7 +8,7 @@
   text-decoration: none;
 }
 
-.navbar span:hover {
+/* .navbar span:hover {
   cursor: pointer;
   color: #433520;
 }
@@ -27,23 +27,9 @@
   overflow: hidden;
 }
 
-.subnav:hover .subnav-content {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  background-color: #025955;
-  color: white;
-}
 
-.subnav-content li {
-  float: left;
-  color: white;
-  list-style-type: none;
-  font-size: 18px;
-  text-decoration: none;
-  padding: 5px;
-  cursor: pointer;
-}
+
+
 
 .subnav .subnavbtn {
   font-size: 20px;
@@ -55,4 +41,4 @@
   background-color: inherit;
   font-family: inherit;
   margin: 0;
-}
+} */ 

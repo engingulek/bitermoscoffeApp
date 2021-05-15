@@ -1,7 +1,11 @@
 .mainPage {
   display: flex;
   flex-direction: column;
+  
 }
+
+
+  
 
 .cardDesign {
   display: flex;
@@ -17,9 +21,16 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
- 
-  
-  
+
+}
+
+@media only screen and (max-width:725px){
+  .cardAndCart{
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+
+  }
 }
 
 .cart{

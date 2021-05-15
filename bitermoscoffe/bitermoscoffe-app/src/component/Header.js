@@ -13,24 +13,26 @@ import {
   login,
   logout,
   selectUser,
-  cartLogin
+  cartLogin,
 } from "../reduxtoolkit/features/login/loginSlice";
-import { menuSelected } from "../reduxtoolkit/features/menu/menuSlice";
+import { menuSelected, serachSelected } from "../reduxtoolkit/features/menu/menuSlice";
 
 function Header() {
   const [inputChanges, setInputChange] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [userSing, setUserSing] = useState(false);
- 
 
   const dispatch = useDispatch();
 
   const inputChange = (e) => {
+    
     if (e.target.value.length > 0) {
       setInputChange(true);
     } else {
       setInputChange(false);
     }
+
+    dispatch(serachSelected(e.target.value))
   };
 
   const clearSearchBar = () => {
@@ -48,8 +50,6 @@ function Header() {
   const menuSelector = useSelector((state) => state.menuRed);
   const [userLoc, setUserLoc] = useState([]);
   // console.log(user.emailInfo);
-  
-  
 
   const localStarnge = () => {
     if (user.userInfo !== null) {
@@ -67,8 +67,6 @@ function Header() {
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const userEmailLoc = localStorage.getItem("userEmailLoc");
   const uidLocOut = JSON.parse(localStorage.getItem("uidLocOut"));
-
-
 
   useEffect(() => {
     localStarnge();
@@ -93,23 +91,23 @@ function Header() {
     setUserSing(false);
     setDropdownOpen(false);
     dispatch(logout());
-    dispatch(cartLogin())
+    dispatch(cartLogin());
     localStorage.setItem("uidLocOut", JSON.stringify(null));
     localStorage.setItem("uidLoc", JSON.stringify(null));
-    
-    
   };
-
-  
 
   const toggle = () => setDropdownOpen((prevState) => !prevState);
   return (
     <div className="header">
       <div className="headerContainer">
-      <Link to="/" className="headertitleLink" onClick={()=> dispatch(menuSelected(""))}>
-      <div className="headertitle">bitermoscoffe</div>
-      </Link>
-      
+        <Link
+          to="/"
+          className="headertitleLink"
+          onClick={() => dispatch(menuSelected(""))}
+        >
+          <div className="headertitle">bitermoscoffe</div>
+        </Link>
+
         <div className="headerSearchBar">
           <SearchBar>
             {inputChanges ? (
@@ -132,8 +130,8 @@ function Header() {
                   onChange={inputChange}
                 />
                 <div>
-                  <HomeIcon />
-                  <span>Ev</span>
+                  
+                  <span>Ara</span>
                   <ArrowForwardIosIcon fontSize="small" />
                 </div>
               </div>
@@ -164,16 +162,31 @@ function Header() {
                         <span>{userNameLoc}</span>
                       </div>
                       <div className="userNumber">
-                        <span>+905345658496</span>
+                        <span>telefonNumarası</span>
                       </div>
                     </div>
                   </div>
                   <div className="userMore">
                     <ol>
-                      <li>Adreslerim</li>
-                      <li>Favori Ürümlerim</li>
-                      <li>Geçmiş Siparişlerim</li>
-                      <li>Fatura Bilgileri</li>
+                      <li>
+                        <Link to="/myAcount" className="link">
+                          Hesabım
+                        </Link>
+                      </li>
+
+                      <li>
+                        <Link to="/favoriList" className="link">
+                          Beğendiklerim
+                        </Link>
+                      </li>
+
+
+                      <li>
+                        <Link to="/pastOrder" className="link">
+                        Geçmiş Siparişlerim
+                        </Link>
+                      </li>
+                    
 
                       <li onClick={singOutbttnOnClick}>Çıkış Yap</li>
                     </ol>
@@ -215,6 +228,10 @@ const SearchBar = styled.div`
     color: #6f4e37;
     background-color: white;
     border-radius: 99px;
+    @media only screen and (max-width:725px){
+      width:240px;
+    }
+   
 
     div {
       border-radius: 0;

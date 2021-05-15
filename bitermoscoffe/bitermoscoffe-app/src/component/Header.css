@@ -12,6 +12,39 @@
   top: 0;
   left: 0;
 }
+
+ @media only screen and (max-width:725px) {
+  .headerContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #6f4e37;
+    padding: 10px;
+    color: white;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    
+  }
+
+.headertitleLink,.headerSearchBar{
+  margin-top: 8px;
+
+}
+ 
+ 
+  } 
+.link{
+  text-decoration: none;
+  color: black;
+}
+.link:hover{
+  color: white;
+  text-decoration: none;
+}
 .userIcons {
   display: flex;
   flex-direction: row;
