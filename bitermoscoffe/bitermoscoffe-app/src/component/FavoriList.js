@@ -96,7 +96,7 @@ function FavoriList() {
       Beğendiklerim
       </FavoriSubTitle>
       <FavoriSubCount>
-      2 Ürün Bulunmaktadır
+      {favoriList.length} Ürün Bulunmaktadır
       </FavoriSubCount>
       
       </FavoriListTitles>

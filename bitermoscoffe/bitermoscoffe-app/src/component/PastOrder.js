@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import db from "../firebase";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import alert from "alertifyjs";
 function PastOrder() {
 
   const [orderPastList, setOrderPastList] = useState([]);
@@ -40,6 +41,44 @@ function PastOrder() {
     setPastOrderPrice(countPrice);
   });
 
+  const pastAddCartList = (item)=>{
+    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+    const addCartItems = db
+        .collection("personList")
+        .doc(uidLoc)
+        .collection("cartList")
+        .doc(item.id);
+      addCartItems.get().then((doc) => {
+        if (doc.exists) {
+          addCartItems.update({
+            addCartProductQuantity: doc.data().addCartProductQuantity + 1,
+          });
+          alert.success("Siparişiniz Tekrar eklemiştir");
+        } else {
+          db.collection("personList")
+            .doc(uidLoc)
+            .collection("cartList")
+            .doc(item.id)
+            .set({
+              addCartProductName: item.data().cartPastOrderListName,
+              addCartProductPrice: item.data().cartPastOrderListPrice,
+              addCartProductQuantity: 1,
+              addCartProductTime: item.data().cartPastOrderListTime,
+              addCartProductKind:item.data().cartPastOrderListKind
+            
+            })
+            .then(() => {
+              alert.success("Siparişiniz Başarıyla eklemiştir");
+            })
+            .catch((error) => {
+              console.error("Error writing document: ", error);
+            });
+        }
+      });
+    
+
+  }
+
   return (
     <Wrapper>
       <Container>
@@ -51,9 +90,13 @@ function PastOrder() {
           </MainTitle>
           <SubTitle>Geçmiş Siparişlerim</SubTitle>
         </PastOrderHeader>
-        <PastOrderProduct>
+        {orderPastList.length===0?
+          <div className="emptyPastOrderList">
+          <span>Geçmiş Siparişiniz Bulunmamaktadır</span>
+          </div>
+          :<PastOrderProduct>
           <PastOrderProductTop>
-            <PastOrderDate> 27 Mayıs 2021</PastOrderDate>
+            <PastOrderDate> 17 Mayıs 2021</PastOrderDate>
             <PastOrderCount>Adet: {orderPastList.length}</PastOrderCount>
             <PastOrderAmount>Fİyat : {pastOrderPrice}₺</PastOrderAmount>
           </PastOrderProductTop>
@@ -71,9 +114,13 @@ function PastOrder() {
               <PastOrderTime>
                 Süre {item.data().cartPastOrderListTime} dk
               </PastOrderTime>
+
+              <TryAddCartList onClick={()=>pastAddCartList(item)}>
+              Sepete Ekle
+              </TryAddCartList>
             </PastOrderProductBottom>
           ))}
-        </PastOrderProduct>
+        </PastOrderProduct>}
       </Container>
     </Wrapper>
   );
@@ -82,10 +129,25 @@ function PastOrder() {
 export default PastOrder;
 
 const Wrapper = styled.div``;
+const TryAddCartList = styled.button`
+border:none;
+padding:5px 10px;
+border-radius:10px;
+background-color:#29bb89;
+color:white;
+`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 30px;
+  .emptyPastOrderList{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-top:20px;
+    font-size:35px;
+    font-weight:bold;
+  }
 
 `;
 const PastOrderHeader = styled.div`

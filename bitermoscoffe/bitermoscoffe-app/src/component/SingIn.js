@@ -2,15 +2,12 @@ import React, { useRef, useState } from "react";
 import styled from "styled-components";
 
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
+
 import { Link, useHistory } from "react-router-dom";
 import { auth, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  emailSingIn,
   login,
-  logout,
-  selectUser,
 } from "../reduxtoolkit/features/login/loginSlice";
 function SingIn() {
   const dispatch = useDispatch();
@@ -112,9 +109,7 @@ else{
             <span>Sosyal medya ile giriş yap</span>
           </div>
           <div className="socialMediaIcon">
-            <div className="facebookIcon">
-              <FaFacebook color="blue" />
-            </div>
+            
             <div className="googleIcon" onClick={singInGoogle}>
               <FcGoogle />
             </div>
@@ -129,9 +124,7 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   flex-direction: column;
-
   max-width: 472px;
   width: 100%;
   margin: 60px auto;
@@ -154,7 +147,6 @@ const SingInContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   flex-direction: column;
   padding: 72px;
   border: 1px solid #e5e5e5;
@@ -201,7 +193,6 @@ const SingInContainer = styled.div`
       }
     }
   }
-
   .withSocialMedia {
     display: flex;
     flex-direction: column;
@@ -223,7 +214,6 @@ const SingInContainer = styled.div`
       flex-direction: row;
       font-size: 35px;
       margin-top: 10px;
-
       :hover {
         cursor: pointer;
       }

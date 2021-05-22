@@ -4,7 +4,7 @@ import setMinutes from "date-fns/setMinutes";
 import addMonths from "date-fns/addMonths";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-
+import alert from "alertifyjs";
 import DatePicker from "react-datepicker";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 import db from "../firebase";
@@ -153,32 +153,40 @@ function CartConfirm() {
   };
 
   const orderClicled = () => {
-    const email = JSON.parse(localStorage.getItem("userEmailLoc"));
-    const userInfoServer = {
-      email: email,
-      summary: [],
-      price: cartConfirmPrice,
-      time: cartConfirmTime,
-    };
-    cartConfirm.map((item) =>
-      userInfoServer.summary.push({
-        name: "İsim: " + item.cartConfirmProducData.addCartProductName,
-        quantity: "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
-      })
-    );
-    axios
-      .post("http://localhost:3005/create", userInfoServer)
-      .then(() => console.log("Book Created"))
-      .catch((err) => {
-        console.error(err);
-      });
-    setModal(!modal);
+    if(adress==="")
+    {
+      alert.error("Adress Seçimi Yapmadan Sipariş Veremezsiniz")
+    }
+    else{
+      const email = JSON.parse(localStorage.getItem("userEmailLoc"));
+      const userInfoServer = {
+        email: email,
+        summary: [],
+        price: cartConfirmPrice,
+        time: cartConfirmTime,
+      };
+      cartConfirm.map((item) =>
+        userInfoServer.summary.push({
+          name: "İsim: " + item.cartConfirmProducData.addCartProductName,
+          quantity: "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
+        })
+      );
+      axios
+        .post("http://localhost:3005/create", userInfoServer)
+        .then(() => console.log("Book Created"))
+        .catch((err) => {
+          console.error(err);
+        });
+      setModal(!modal);
+    }
+   
   };
 
   const cartConfirmClicked = () => {
     setModal(!modal);
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     cartConfirm.map((item) =>
+
       db
         .collection("personList")
         .doc(uidLoc)
@@ -190,6 +198,8 @@ function CartConfirm() {
           cartConfirmListQunatity:
             item.cartConfirmProducData.addCartProductQuantity,
           cartConfirmListTime: item.cartConfirmProducData.addCartProductTime,
+          cartConfirmListKin:item.cartConfirmProducData.addCartProductKind
+          
         })
     );
 
@@ -283,8 +293,15 @@ function CartConfirm() {
                       
                     </Select>
                   </FormControl>
+                 
                 </div>
+               
               </div>
+              {myAddress.length===0 &&
+                <div className="emptyAdress">
+              Hiç Bir Adresiniz Bulunmamaktadır. <Link to="/myAcount">Hesabıma</Link> giderek yeni adres ekleyiniz
+                </div>}
+             
               <div className="userAdress">
              
               {adress===""?<div className="adress">Bir Adress giriniz</div>:
@@ -555,6 +572,9 @@ const OrderUserDec = styled.div`
   .orderUserAdress {
     display: flex;
     flex-direction: column;
+    .emptyAdress{
+      width:330px;
+    }
     .titleAdress {
       display:flex;
       align-items:center;

@@ -2,28 +2,23 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
+import alert from "alertifyjs";
 import db from "../firebase";
 import StepContainer from "./StepContainer";
 import { cartConfirmHiddle } from "../reduxtoolkit/features/product/productSlice";
-
+import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 function Cart() {
   const [locId, setlocId] = useState("");
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const cartSelector = useSelector((state) => state.productRed);
-   const [cartListConfirm, setCartListConfirm] = useState([]);
+  const [cartListConfirm, setCartListConfirm] = useState([]);
   const dispatch = useDispatch();
   const [cartProductList, setcartProductList] = useState([]);
-  const [cartConfirmPrice, setCartConfirmPrice] = useState(0)
-  const [cartConfirmTime, setCartConfirmTime] = useState(0)
+  const [cartConfirmPrice, setCartConfirmPrice] = useState(0);
+  const [cartConfirmTime, setCartConfirmTime] = useState(0);
   // const [price, setPrice] = useState(0);
 
-   const loginSelector = useSelector(state => state.loginRed)
-   
- 
-
- 
-  
+  const loginSelector = useSelector((state) => state.loginRed);
 
   useEffect(() => {
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
@@ -39,34 +34,27 @@ function Cart() {
           setcartProductList(cartItem);
         });
     }
-  },[]);
+  }, []);
 
   useEffect(() => {
     setlocId(uidLoc);
   }, [locId]);
 
-
   useEffect(() => {
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-    if(uidLoc !== null)
-    {
+    if (uidLoc !== null) {
       db.collection("personList")
-      .doc(uidLoc)
-      .collection("cartConfirmList")
-      .onSnapshot((onSnapshot) => {
-        const cartConfrimListItems = [];
-        onSnapshot.forEach((doc) => {
-          
+        .doc(uidLoc)
+        .collection("cartConfirmList")
+        .onSnapshot((onSnapshot) => {
+          const cartConfrimListItems = [];
+          onSnapshot.forEach((doc) => {
             cartConfrimListItems.push(doc);
-           
-          
+          });
+          setCartListConfirm(cartConfrimListItems);
         });
-        setCartListConfirm(cartConfrimListItems);
-      });
     }
-   
-
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (cartSelector.cartConfirmHid === false) {
@@ -84,6 +72,7 @@ function Cart() {
             cartPastOrderListPrice: item.data().cartConfirmListPrice,
             cartPastOrderListQunatity: item.data().cartConfirmListQunatity,
             cartPastOrderListTime: item.data().cartConfirmListTime,
+            cartPastOrderListKind:item.data().cartConfirmListKin
           })
       );
 
@@ -102,12 +91,7 @@ function Cart() {
           })
       );
     }
-    
   }, [cartSelector.cartConfirmHid]);
-
-
-
-
 
   useEffect(() => {
     let countPrice = 0;
@@ -115,143 +99,171 @@ function Cart() {
 
     cartListConfirm.map((item) => {
       countPrice +=
-        item.data().cartConfirmListPrice *
-        item.data().cartConfirmListQunatity;
+        item.data().cartConfirmListPrice * item.data().cartConfirmListQunatity;
       countTime += item.data().cartConfirmListTime;
     });
     setCartConfirmPrice(countPrice);
-    
-    
+
     setCartConfirmTime(countTime);
-  },[cartListConfirm]);
+  }, [cartListConfirm]);
+
+  const addClicReduce = (item) => {
+    if (item.data().addCartProductQuantity === 1) {
+      db.collection("personList")
+        .doc(uidLoc)
+        .collection("cartList")
+        .doc(item.id)
+        .delete()
+        .then(() => {
+          alert.success("Ürün Sepetten Kaldırıldı");
+        })
+        .catch((error) => {
+          console.error("Error removing document: ", error);
+        });
+    }
+
+    else{
+      db.collection("personList")
+      .doc(uidLoc)
+      .collection("cartList")
+      .doc(item.id)
+      .update({
+        addCartProductQuantity: item.data().addCartProductQuantity -1,
+      });
+
+    }
+  };
+
+  const addClickIncreuce = (item) => {
+    db.collection("personList")
+      .doc(uidLoc)
+      .collection("cartList")
+      .doc(item.id)
+      .update({
+        addCartProductQuantity: item.data().addCartProductQuantity + 1,
+      });
+  };
 
   return (
     <Wrapper>
-    <Container>
-     
-    {uidLoc === null?<CartLoginOut>
-      <div>
-        <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
-      </div>
-    </CartLoginOut>:
-    cartProductList.length===0&&cartListConfirm.length===0 && uidLoc!==null
-
-    ?
-    <div className="cartListEmpty">
-    <div>
-    <span>Sepeteniz</span>
-    </div>
-    <div>
-    <span>Boş</span>
-    </div>
-          
-         
-        </div>
-        :
-        cartListConfirm.length===0?
-        <CartWrapper>
-        
-          {cartProductList.map((item) => (
-            <CartContainer>
-              <ProductCartInfo>
-                <div className="productInfo">
-                  <div className="productName">
-                    <span>{item.data().addCartProductName}</span>
-                  </div>
-                  <div className="thermosLitre">
-                    <span>
-                      {item.data().addCartProductKind} x{" "}
-                      {item.data().addCartProductQuantity}
-                    </span>
-                  </div>
-                  <div className="amount">
-                    <span>
-                      {item.data().addCartProductPrice *
-                        item.data().addCartProductQuantity}
-                      .00 ₺
-                    </span>
-                  </div>
-                  <div className="makeTime">
-                    <div className="totalTime">
-                      <span>
-                        {item.data().addCartProductTime + 15} dk{" "}
-                      </span>
-                    </div>
-                    <div className="deliveryAndMakeTime">
-                      <span>
-                        Hazırlanış: {item.data().addCartProductTime}{" "}
-                        <br />
-                        Teslimat: 15dk
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="remove">
-                  <div className="reduce">-</div>
-                  <div className="count">
-                    {item.data().addCartProductQuantity}
-                  </div>
-
-                  <div className="increuce">+</div>
-                </div>
-              </ProductCartInfo>
-            </CartContainer>
-          ))}
-
-          <ButtonConfirm>
-          <Link className="link" to="/cartConfirm">
+      <Container>
+        {uidLoc === null ? (
+          <CartLoginOut>
             <div>
-                <button>Sepeti Onayla</button>
+              <span>Giriş Yapmadan Alışveriş Yapamazsınız</span>
             </div>
-            </Link>
-          </ButtonConfirm>
-        </CartWrapper>:
-        <div className="cartConfirm">
-        <div className="cartConfirmTitle">
-        <span>
-        Sipariş Verdiğinz Ürünler
-        </span>
-        </div>
-       
-        {cartListConfirm.map((item)=>(
-          <div className="cartConfirmDesc">
-          <span>{item.data().cartConfirmListName} x {item.data().cartConfirmListQunatity}</span>
+          </CartLoginOut>
+        ) : cartProductList.length === 0 &&
+          cartListConfirm.length === 0 &&
+          uidLoc !== null ? (
+          <div className="cartListEmpty">
+            <div>
+              <span>Sepeteniz</span>
+            </div>
+            <div>
+              <span>Boş</span>
+            </div>
           </div>
-          
-        ))}
-        <div className="line"/>
-        <div className="cartConfirmDesc">
-        <span style={{color:"black"}}>
-        Sipariş Toplamı :  {cartConfirmPrice}
-        </span>
-     
-        </div>
-        
-        <div className="cartConfirmDesc">
-        <span style={{color:"black"}}>
-        Teslim Süresi : {cartConfirmTime}
-        </span>
-        </div>
-        <StepContainer />
-        </div>
-      
-    
-        
-        }
+        ) : cartListConfirm.length === 0 ? (
+          <CartWrapper>
+            {cartProductList.map((item) => (
+              <CartContainer>
+                <ProductCartInfo>
+                  <div className="productInfo">
+                    <div className="productName">
+                      <span>{item.data().addCartProductName}</span>
+                    </div>
+                    <div className="thermosLitre">
+                      <span>
+                        {item.data().addCartProductKind} x{" "}
+                        {item.data().addCartProductQuantity}
+                      </span>
+                    </div>
+                    <div className="amount">
+                      <span>
+                        {item.data().addCartProductPrice *
+                          item.data().addCartProductQuantity}
+                        .00 ₺
+                      </span>
+                    </div>
+                    <div className="makeTime">
+                      <div className="totalTime">
+                        <span>{item.data().addCartProductTime + 15} dk </span>
+                      </div>
+                      <div className="deliveryAndMakeTime">
+                        <span>
+                          Hazırlanış: {item.data().addCartProductTime} <br />
+                          Teslimat: 15dk
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="remove">
+                  {item.data().addCartProductQuantity===1?<DeleteForeverIcon
+                    onClick={() => addClicReduce(item)}
+                    />:
+                    <div className="reduce" onClick={() => addClicReduce(item)} >
+                    -
+                  </div>}
+                   
+                    <div className="count">
+                      {item.data().addCartProductQuantity}
+                    </div>
 
+                    <div
+                      className="increuce"
+                      onClick={() => addClickIncreuce(item)}
+                    >
+                      +
+                    </div>
+                  </div>
+                </ProductCartInfo>
+              </CartContainer>
+            ))}
 
-     
-    </Container>
+            <ButtonConfirm>
+              <Link className="link" to="/cartConfirm">
+                <div>
+                  <button>Sepeti Onayla</button>
+                </div>
+              </Link>
+            </ButtonConfirm>
+          </CartWrapper>
+        ) : (
+          <div className="cartConfirm">
+            <div className="cartConfirmTitle">
+              <span>Sipariş Verdiğinz Ürünler</span>
+            </div>
+
+            {cartListConfirm.map((item) => (
+              <div className="cartConfirmDesc">
+                <span>
+                  {item.data().cartConfirmListName} x{" "}
+                  {item.data().cartConfirmListQunatity}
+                </span>
+              </div>
+            ))}
+            <div className="line" />
+            <div className="cartConfirmDesc">
+              <span style={{ color: "black" }}>
+                Sipariş Toplamı : {cartConfirmPrice}
+              </span>
+            </div>
+
+            <div className="cartConfirmDesc">
+              <span style={{ color: "black" }}>
+                Teslim Süresi : {cartConfirmTime}
+              </span>
+            </div>
+            <StepContainer />
+          </div>
+        )}
+      </Container>
     </Wrapper>
   );
-
-  
 }
 
-
 const Wrapper = styled.div``;
-
-
 
 const Container = styled.div`
   display: flex;
@@ -262,53 +274,44 @@ const Container = styled.div`
   margin-left: 15px;
   border-radius: 10px;
   border: 1px solid brown;
-  .cartListEmpty{
-       color:red;
-       display:flex;
-       margin:30px;
-       flex-direction:column;
-       align-items:center;
-         justify-content:center;
-         font-size: 20px;
-      
-       
-     }
-   
-  .cartConfirm{
-    display:flex;
-     flex-direction:column;
-     align-items:center;
-     justify-content:center;
-     cursor: default;
-    .cartConfirmTitle{
-       margin-top:10px;
-       margin-bottom:20px;
-       font-size:17px;
-       font-weight:bold;
-      
-     }
+  .cartListEmpty {
+    color: red;
+    display: flex;
+    margin: 30px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
 
-     .line{
-       border:1px solid brown;
-       width:100%;
-       height:6px;
-       background-color:brown;
-       margin-bottom:10px;
-       border-radius:100px;
-     }
+  .cartConfirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    .cartConfirmTitle {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      font-size: 17px;
+      font-weight: bold;
+    }
 
-     .cartConfirmDesc{
-       font-size:17px;
-       font-weight:bold;
-       color:brown;
-       margin-bottom:10px;
-      
-     }
-    
+    .line {
+      border: 1px solid brown;
+      width: 100%;
+      height: 6px;
+      background-color: brown;
+      margin-bottom: 10px;
+      border-radius: 100px;
+    }
 
-     
-    
-  
+    .cartConfirmDesc {
+      font-size: 17px;
+      font-weight: bold;
+      color: brown;
+      margin-bottom: 10px;
+    }
   }
 `;
 const CartWrapper = styled.div``;

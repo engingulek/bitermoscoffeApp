@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { auth, providerFacebook, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
+import alert from "alertifyjs";
 import {
   login,
   logout,
@@ -19,13 +20,15 @@ function SingUp() {
 
   const singUpPasswordAndEmail = (event) => {
     event.preventDefault();
-    if (
-      inputName.current.value !== "" ||
-      inputSurname.value !== "" ||
-      inputEmail.current.value !== "" ||
-      inputPassword.current.value.length >= 6
-    ) {
-      auth
+if(inputName.current.value === "" ||
+inputSurname.current.value === "" ||
+inputEmail.current.value === "" 
+)
+{
+  alert.error("Boş bırakılan yerleri doldurunuz")
+}
+else{
+  auth
         .createUserWithEmailAndPassword(
           inputEmail.current.value,
           inputPassword.current.value
@@ -37,9 +40,21 @@ function SingUp() {
           });
         })
         .catch((err) => {
-          console.log(err);
+          if (err.code ==="auth/invalid-email") {
+            alert.error("Desteklenmeyen e-mail şekli")
+            
+            }
+            else if (err.code ==="auth/weak-password")
+            {
+              alert.error("6 karakterden uzun şifre giriniz")
+            }
         });
-    }
+}
+
+
+
+
+   
   };
 
   const singUpGoogle = () => {
@@ -65,12 +80,7 @@ function SingUp() {
             <span>Sosyal medya ile üye ol </span>
           </div>
           <div className="socialMediaIcon">
-            <div className="facebookIcon">
-              <img
-                src="https://i.pinimg.com/736x/ac/57/3b/ac573b439cde3dec8ca1c6739ae7f628.jpg"
-                alt="facebookIcon"
-              />
-            </div>
+            
             <div className="googleIcon" onClick={singUpGoogle}>
               <img
                 src="https://img-authors.flaticon.com/google.jpg"
@@ -119,9 +129,7 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   flex-direction: column;
-
   max-width: 472px;
   width: 100%;
   margin: 60px auto;
@@ -144,7 +152,6 @@ const SingUpContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   flex-direction: column;
   padding: 72px;
   border: 1px solid #e5e5e5;
@@ -160,24 +167,19 @@ const SingUpContainer = styled.div`
       margin-top: 18px;
       margin-bottom: 18px;
       justify-content: space-evenly;
-
       .googleIcon,
       .facebookIcon {
         display: flex;
-
         justify-content: center;
         align-content: center;
         border-radius: 4px;
-
         height: 100%;
         border: 1px solid lightgray;
         :hover {
           cursor: pointer;
         }
-
         img {
           padding-left: 5px;
-
           width: 50px;
           height: 50px;
         }
@@ -187,7 +189,6 @@ const SingUpContainer = styled.div`
   .withEmailPassaword {
     display: flex;
     flex-direction: column;
-
     .userForm {
       form {
         display: flex;
@@ -210,13 +211,10 @@ const SingUpContainer = styled.div`
       }
     }
   }
-
   .singUpBttn {
     margin-top: 20px;
-
     button {
       border: none;
-
       min-width: 180px;
       padding-top: 10px;
       padding-bottom: 10px;

@@ -8,55 +8,71 @@ import db from "../firebase";
 import { useRef } from "react";
 function MyAcount() {
   const [modal, setModal] = useState(false);
-  const toggle = () => setModal(!modal);
+  const toggle = () => {setModal(!modal) 
+    setSave(true)};
   const addressTile = useRef(null);
   const addressLocation = useRef(null);
+  const editaddressTile = useRef(null);
+  const editaddressLocation = useRef(null);
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const userNameLoc = JSON.parse(localStorage.getItem("userNameLoc"));
+  const [save,setSave] = useState(false)
+  const [defaultTitle , setDefaultTitle] = useState("")
+  const [defaultLocation , setDefaulttLocation ] = useState("")
+  const [itemId , setItemId ] = useState("")
 const [myAddress, setMyAddress] = useState([])
   const newAddAdress = (event) => {
-    event.preventDefault();
-    const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-    if (
-      addressTile.current.value === "" ||
-      addressLocation.current.value === ""
-    ) {
-      alert.error("Boş alanları doldurunnuz");
-    } else if (addressLocation.current.value.length < 40) {
-      alert.error("Adresinizi biraz daha belirtiniz");
-    } else {
-      console.log(addressTile.current.value);
-      console.log(addressLocation.current.value);
-      const addCartItems = db
-        .collection("personList")
-        .doc(uidLoc)
-        .collection("addressList")
-        .doc(addressTile.current.value);
 
-      addCartItems.get().then((doc) => {
-        if (doc.exists) {
-          alert.error("Böyle Bir Adres Başlığı Bulunmaktadır");
-          setModal(true);
-        } else {
-          db.collection("personList")
-            .doc(uidLoc)
-            .collection("addressList")
-
-            .doc(addressTile.current.value)
-            .set({
-              addressTitle: addressTile.current.value,
-              addressLocation: addressLocation.current.value,
-            })
-            .then(() => {
-              alert.success("Adresiniz Başarıyla Eklenmiştir");
-            })
-            .catch((error) => {
-              console.error("Error writing document: ", error);
-            });
-          setModal(!modal);
-        }
-      });
+    if(save===true)
+    {
+      console.log("Kaydet")
+      event.preventDefault();
+    
+      const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
+      if (
+        addressTile.current.value === "" ||
+        addressLocation.current.value === ""
+      ) {
+        alert.error("Boş alanları doldurunnuz");
+      } else if (addressLocation.current.value.length < 40) {
+        alert.error("Adresinizi biraz daha belirtiniz");
+      } else {
+        console.log(addressTile.current.value);
+        console.log(addressLocation.current.value);
+        const addCartItems = db
+          .collection("personList")
+          .doc(uidLoc)
+          .collection("addressList")
+          .doc(addressTile.current.value);
+  
+        addCartItems.get().then((doc) => {
+          if (doc.exists) {
+            alert.error("Böyle Bir Adres Başlığı Bulunmaktadır");
+            setModal(true);
+          } else {
+            db.collection("personList")
+              .doc(uidLoc)
+              .collection("addressList")
+  
+              .doc(addressTile.current.value)
+              .set({
+                addressTitle: addressTile.current.value,
+                addressLocation: addressLocation.current.value,
+              })
+              .then(() => {
+                alert.success("Adresiniz Başarıyla Eklenmiştir");
+              })
+              .catch((error) => {
+                console.error("Error writing document: ", error);
+              });
+            setModal(!modal);
+          }
+        });
+      }
     }
+
+  
+    
   };
 
 
@@ -73,6 +89,75 @@ useEffect(() => {
           setMyAddress(addressListItems);
         });
 }, [])
+
+
+const deleteMyAdress = (item)=>{
+
+  db.collection("personList")
+        .doc(uidLoc)
+        .collection("addressList")
+        .doc(item.id)
+        .delete()
+        .then(() => {
+          alert.success("Adres Silindi");
+        })
+        .catch((error) => {
+          console.error("Error removing document: ", error);
+        });
+
+}
+
+const editAddAdress = (event)=>{
+  event.preventDefault()
+  console.log(itemId)
+  console.log(editaddressTile.current.value)
+  console.log(editaddressLocation.current.value)
+
+  if(editaddressTile.current.value==="" || editaddressLocation.current.value === "")
+  {
+    alert.error("Değiştime işlemi yapmadınız");
+    setModal(!modal)
+  }else if (editaddressLocation.current.value>40)
+  {
+    alert.error("Adressi birazdaha açıklayınız");
+  }
+  else{
+    db.collection("personList")
+    .doc(uidLoc)
+    .collection("addressList")
+    .doc(itemId)
+    .update({
+      addressTitle:editaddressTile.current.value,
+      addressLocation:editaddressLocation.current.value
+    });
+    setModal(!modal)
+
+  }
+
+
+ 
+
+}
+// açan 
+const editMyAdress = (item)=>{
+  setSave(false)
+  setModal(!modal)
+  setDefaultTitle(item.data().addressTitle)
+  setDefaulttLocation(item.data().addressLocation)
+  setItemId(item.id)
+    
+   
+ 
+
+
+  
+
+  
+  
+
+}
+
+
 
   return (
     <Wrapper>
@@ -151,8 +236,8 @@ useEffect(() => {
                  
                   
                   <Buttons>
-                    <DeleteAdress>Sil</DeleteAdress>
-                    <EditAdress>Düzenle</EditAdress>
+                    <DeleteAdress onClick={()=>deleteMyAdress(item)}>Sil</DeleteAdress>
+                    <EditAdress onClick={()=>editMyAdress(item)}>Düzenle</EditAdress>
                   </Buttons>
                 </MyAdressInfo>
                   ))}
@@ -162,7 +247,7 @@ useEffect(() => {
           </MyInfo>
         </MyInfoContainer>
       </MyAccountPage>
-      <div>
+      {save?<div>
         <Modal isOpen={modal} toggle={toggle}>
           <ModalHeader toggle={toggle}>Yeni Adress Ekle</ModalHeader>
           <ModalBody>
@@ -183,7 +268,8 @@ useEffect(() => {
                   marginTop: "20px",
                 }}
               >
-                Kaydet
+              Kaydet
+              
               </Button>
               <Button
                 color="secondary"
@@ -196,7 +282,42 @@ useEffect(() => {
           </ModalBody>
           <ModalFooter></ModalFooter>
         </Modal>
-      </div>
+      </div>:<div>
+      <Modal isOpen={modal} toggle={toggle}>
+        <ModalHeader toggle={toggle}>Adresi Değiştir</ModalHeader>
+        <ModalBody>
+          <form onSubmit={editAddAdress}>
+            <Container>
+              <AddAdressNameLabel>Adres Başlığı:</AddAdressNameLabel>
+              <AddAdressNameInput placeholder={defaultTitle} ref={editaddressTile} />
+
+              <AddAdressLocationLabel>Açık Adres:</AddAdressLocationLabel>
+              <AddAdressLocationInput placeholder={defaultLocation} ref={editaddressLocation} />
+            </Container>
+
+            <Button
+              color="primary"
+              style={{
+                float: "right",
+                marginLeft: "30px",
+                marginTop: "20px",
+              }}
+            >
+            Düzenle
+            
+            </Button>
+            <Button
+              color="secondary"
+              style={{ float: "right", marginTop: "20px" }}
+              onClick={toggle}
+            >
+              İptal Et
+            </Button>
+          </form>
+        </ModalBody>
+        <ModalFooter></ModalFooter>
+      </Modal>
+    </div>}
     </Wrapper>
   );
 }
