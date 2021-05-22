@@ -187,13 +187,11 @@ function Cart() {
                       </span>
                     </div>
                     <div className="makeTime">
-                      <div className="totalTime">
-                        <span>{item.data().addCartProductTime + 15} dk </span>
-                      </div>
+                      
                       <div className="deliveryAndMakeTime">
                         <span>
-                          Hazırlanış: {item.data().addCartProductTime} <br />
-                          Teslimat: 15dk
+                          Hazırlanış: {item.data().addCartProductTime*item.data().addCartProductQuantity} <br />
+                          
                         </span>
                       </div>
                     </div>

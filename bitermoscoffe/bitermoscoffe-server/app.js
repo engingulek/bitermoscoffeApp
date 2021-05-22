@@ -42,7 +42,7 @@ var mailOptions = {
 from: "bitermoscoffe@gmail.com",
 to: req.body.email,
 subject: "Sipariş",
-html : htmlToSend +'<br>'+'<div style="font-size: 20px"><span>'+summary+' siparişleriniz bunlardır</span><br><span>Fiyat: '+req.body.price +' TL</span><br><span> Teslim Süresi: '+req.body.time+' dk </span></div>'};
+html : htmlToSend +'<br>'+'<div style="font-size: 20px"><span>'+summary+' siparişleriniz bunlardır</span><br><span>Fiyat: '+req.body.price +' TL</span><br><span> Teslim Süresi: '+req.body.minTime+'-'+req.body.maxTime+' dk arasında olacaktır </span></div>'};
 transporter.sendMail(mailOptions, function (error, response) {
 if (error) {
 console.log(error);
