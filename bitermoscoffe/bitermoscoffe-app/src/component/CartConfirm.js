@@ -16,6 +16,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
+import { cartConfirmTimeReducer } from "../reduxtoolkit/features/product/productSlice";
 
 function CartConfirm() {
   const [modal, setModal] = useState(false);
@@ -28,10 +29,20 @@ function CartConfirm() {
   const [date, setDate] = useState(oorderTime);
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const [cartConfirm, setCartConfirm] = useState([]);
-  const [cartConfirmTime, setCartConfirmTime] = useState(0);
+  const [stepTimer, setStepTimer] = useState({
+    makeReady: 0,
+    deliver: 0,
+  });
+  // local bilgisi olmadıığından teslim süresi default verildi
+  const [locationTime, setLocationTime] = useState(20);
+
+  const [cartConfirmTime, setCartConfirmTime] = useState({
+    max: 0,
+    min: 0,
+  });
   const [cartConfirmPrice, setCaetConfirmPrice] = useState(0);
-  const [myAddress, setMyAddress] = useState([])
-  const [myAddressTitle, setMyAddressTitle] = useState([])
+  const [myAddress, setMyAddress] = useState([]);
+  const [myAddressTitle, setMyAddressTitle] = useState([]);
   const a = 0;
 
   const useStyles = makeStyles((theme) => ({
@@ -81,68 +92,79 @@ function CartConfirm() {
       });
   }, []);
 
-
   useEffect(() => {
     db.collection("personList")
-    .doc(uidLoc)
-    .collection("addressList")
-    .onSnapshot((onSnapshot) => {
-      const addressListItems = [];
-      onSnapshot.forEach((doc) => {
-        addressListItems.push(doc.data().addressTitle);
-      });
-      setMyAddressTitle(addressListItems);
-    });
-  }, [])
-
-  useEffect(() => {
-    if(adress==="")
-    {
-      db.collection("personList")
       .doc(uidLoc)
       .collection("addressList")
       .onSnapshot((onSnapshot) => {
         const addressListItems = [];
         onSnapshot.forEach((doc) => {
-          addressListItems.push(doc);
+          addressListItems.push(doc.data().addressTitle);
         });
-        setMyAddress(addressListItems);
+        setMyAddressTitle(addressListItems);
       });
-    }
-    else{
+  }, []);
+
+  useEffect(() => {
+    if (adress === "") {
       db.collection("personList")
-      .doc(uidLoc)
-      .collection("addressList").where("addressTitle","==",adress)
-      .onSnapshot((onSnapshot) => {
-        const addressListItems = [];
-        onSnapshot.forEach((doc) => {
-          addressListItems.push(doc);
+        .doc(uidLoc)
+        .collection("addressList")
+        .onSnapshot((onSnapshot) => {
+          const addressListItems = [];
+          onSnapshot.forEach((doc) => {
+            addressListItems.push(doc);
+          });
+          setMyAddress(addressListItems);
         });
-        setMyAddress(addressListItems);
-      });
-
+    } else {
+      db.collection("personList")
+        .doc(uidLoc)
+        .collection("addressList")
+        .where("addressTitle", "==", adress)
+        .onSnapshot((onSnapshot) => {
+          const addressListItems = [];
+          onSnapshot.forEach((doc) => {
+            addressListItems.push(doc);
+          });
+          setMyAddress(addressListItems);
+        });
     }
-   
-  },[myAddress])
-
-
+  }, [myAddress]);
 
   useEffect(() => {
     let countPrice = 0;
-    let countTime = 0;
+    let countTime = [];
+    let defaultTime = 0;
 
-    cartConfirm.map((item) => {
+    cartConfirm.forEach((element) => {
       countPrice +=
-        item.cartConfirmProducData.addCartProductPrice *
-        item.cartConfirmProducData.addCartProductQuantity;
-      countTime += item.cartConfirmProducData.addCartProductTime;
+        element.cartConfirmProducData.addCartProductPrice *
+        element.cartConfirmProducData.addCartProductQuantity;
+      countTime.push(element.cartConfirmProducData.addCartProductTime*element.cartConfirmProducData.addCartProductQuantity);
     });
+
+    // cartConfirm.map((item) => {
+    //   countPrice +=
+    //     item.cartConfirmProducData.addCartProductPrice *
+    //     item.cartConfirmProducData.addCartProductQuantity;
+
+    // });
+
+    // console.log(Math.max(...countTime));
+    // console.log(Math.min(...countTime));
     setCaetConfirmPrice(countPrice);
+
+    setCartConfirmTime({
+      min: Math.max(...countTime) + locationTime,
+      max: Math.max(...countTime) + locationTime + 15,
+    });
+
+    setStepTimer({ makeReady: Math.max(...countTime)===0?10:Math.max(...countTime)===0, deliver: locationTime });
+
     // console.log(countPrice)
     // console.log(countTime)
-
-    setCartConfirmTime(countTime);
-  });
+  }, [cartConfirm]);
 
   const timeToggle = () => {
     setTimeModal(!timeModal);
@@ -153,22 +175,22 @@ function CartConfirm() {
   };
 
   const orderClicled = () => {
-    if(adress==="")
-    {
-      alert.error("Adress Seçimi Yapmadan Sipariş Veremezsiniz")
-    }
-    else{
+    if (adress === "") {
+      alert.error("Adress Seçimi Yapmadan Sipariş Veremezsiniz");
+    } else {
       const email = JSON.parse(localStorage.getItem("userEmailLoc"));
       const userInfoServer = {
         email: email,
         summary: [],
         price: cartConfirmPrice,
-        time: cartConfirmTime,
+        minTime: cartConfirmTime.min,
+        maxTime: cartConfirmTime.max,
       };
       cartConfirm.map((item) =>
         userInfoServer.summary.push({
           name: "İsim: " + item.cartConfirmProducData.addCartProductName,
-          quantity: "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
+          quantity:
+            "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
         })
       );
       axios
@@ -178,15 +200,16 @@ function CartConfirm() {
           console.error(err);
         });
       setModal(!modal);
+  
+      console.log(stepTimer)
+      dispatch(cartConfirmTimeReducer(stepTimer));
     }
-   
   };
 
   const cartConfirmClicked = () => {
     setModal(!modal);
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     cartConfirm.map((item) =>
-
       db
         .collection("personList")
         .doc(uidLoc)
@@ -198,8 +221,7 @@ function CartConfirm() {
           cartConfirmListQunatity:
             item.cartConfirmProducData.addCartProductQuantity,
           cartConfirmListTime: item.cartConfirmProducData.addCartProductTime,
-          cartConfirmListKin:item.cartConfirmProducData.addCartProductKind
-          
+          cartConfirmListKin: item.cartConfirmProducData.addCartProductKind,
         })
     );
 
@@ -224,7 +246,6 @@ function CartConfirm() {
 
   const handleChange = (event) => {
     setAdress(event.target.value);
-
   };
 
   return (
@@ -232,13 +253,15 @@ function CartConfirm() {
       <CartConfirmContainer>
         <HeaderContainer>
           <div className="pageTitle">
-          <Link className="link" to="/">
-          <span>bitermoscoffe</span>
-          </Link>
-            
+            <Link className="link" to="/">
+              <span>bitermoscoffe</span>
+            </Link>
           </div>
           <div className="deliveryTimeHeader">
-            <span>10-{cartConfirmTime + 10}dk</span>
+            {/*15 dk gecikme payı */}
+            <span>
+              {cartConfirmTime.min}-{cartConfirmTime.max}dk
+            </span>
           </div>
         </HeaderContainer>
         <Order>
@@ -279,44 +302,42 @@ function CartConfirm() {
                 </div>
                 <div>
                   <FormControl className={classes.formControl}>
-                    <InputLabel id="demo-simple-select-label">Adreslerim</InputLabel>
+                    <InputLabel id="demo-simple-select-label">
+                      Adreslerim
+                    </InputLabel>
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
                       value={adress}
                       onChange={handleChange}
                     >
-                    {myAddressTitle.map((item)=>(
-                      <MenuItem value={item}>{item}</MenuItem>
-                    ))}
-                    
-                      
+                      {myAddressTitle.map((item) => (
+                        <MenuItem value={item}>{item}</MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
-                 
                 </div>
-               
               </div>
-              {myAddress.length===0 &&
+              {myAddress.length === 0 && (
                 <div className="emptyAdress">
-              Hiç Bir Adresiniz Bulunmamaktadır. <Link to="/myAcount">Hesabıma</Link> giderek yeni adres ekleyiniz
-                </div>}
-             
+                  Hiç Bir Adresiniz Bulunmamaktadır.{" "}
+                  <Link to="/myAcount">Hesabıma</Link> giderek yeni adres
+                  ekleyiniz
+                </div>
+              )}
+
               <div className="userAdress">
-             
-              {adress===""?<div className="adress">Bir Adress giriniz</div>:
-             
-              <AddressLocations >
-              {
-                myAddress.map((item)=>(
-                  <AddressLocation >
-                  {item.data().addressLocation}
-                  </AddressLocation>
-                
-                ))
-              }</AddressLocations>}
-                
-               
+                {adress === "" ? (
+                  <div className="adress">Bir Adress giriniz</div>
+                ) : (
+                  <AddressLocations>
+                    {myAddress.map((item, index) => (
+                      <AddressLocation key={index}>
+                        {item.data().addressLocation}
+                      </AddressLocation>
+                    ))}
+                  </AddressLocations>
+                )}
               </div>
             </div>
             <div style={{ marginTop: "20px" }}>
@@ -332,9 +353,8 @@ function CartConfirm() {
                 <span>Fiyat</span>
               </div>
               <div className="ordersContainer">
-                {cartConfirm.map((item, index) => (
-                  <div key={index}>
-                    <div className="ordersIndex">{index + 1}</div>
+                {cartConfirm.map((item) => (
+                  <div key={item.cartConfirmProductId}>
                     <div className="ordersName">
                       {item.cartConfirmProducData.addCartProductName}
                     </div>
@@ -432,11 +452,10 @@ const HeaderContainer = styled.div`
   z-index: 1000;
   top: 0;
   left: 0;
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     display: flex;
-  flex-direction: column;
-   
-}
+    flex-direction: column;
+  }
 
   .pageTitle {
     span {
@@ -462,20 +481,13 @@ const Order = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     display: flex;
-  flex-direction: column;
-   
-}
-
-
-
-  
+    flex-direction: column;
+  }
 `;
 
-const AddressLocations = styled.div`
-
-`
+const AddressLocations = styled.div``;
 const OrderDec = styled.div`
   display: flex;
   flex-direction: column;
@@ -554,34 +566,30 @@ const OrderDec = styled.div`
 `;
 
 const AddressLocation = styled.textarea`
+  width: 100%;
+  height: 100%;
+  font-size: 18px;
+  outline-width: 0px;
+  border: none;
 
-width:100%;
-height:100%;
-font-size:18px;
-outline-width:0px;
-border:none;
-
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     display: flex;
-  flex-direction: column;
-   
-}
-
-`
+    flex-direction: column;
+  }
+`;
 const OrderUserDec = styled.div`
   .orderUserAdress {
     display: flex;
     flex-direction: column;
-    .emptyAdress{
-      width:330px;
+    .emptyAdress {
+      width: 330px;
     }
     .titleAdress {
-      display:flex;
-      align-items:center;
-      
-      
+      display: flex;
+      align-items: center;
+
       span {
-        margin-right:20px;
+        margin-right: 20px;
         font-size: 20px;
         font-weight: 600;
       }
@@ -593,23 +601,17 @@ const OrderUserDec = styled.div`
       border: 2px solid #6f4e37;
       padding: 10px 20px;
       border-radius: 5px;
-      @media only screen and (max-width:725px){
+      @media only screen and (max-width: 725px) {
         width: 100%;
-  
-   
-}
+      }
 
-.adress{
-  .addressLocation{
-    @media only screen and (max-width:725px){
-      width: 100px;
-       
-  
-   
-}
-
-  }
-}
+      .adress {
+        .addressLocation {
+          @media only screen and (max-width: 725px) {
+            width: 100px;
+          }
+        }
+      }
     }
   }
 
