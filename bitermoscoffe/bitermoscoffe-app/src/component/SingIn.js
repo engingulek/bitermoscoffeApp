@@ -6,6 +6,8 @@ import { FcGoogle } from "react-icons/fc";
 import { Link, useHistory } from "react-router-dom";
 import { auth, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
+
+import alert from "alertifyjs";
 import {
   login,
 } from "../reduxtoolkit/features/login/loginSlice";
@@ -19,7 +21,7 @@ function SingIn() {
 
   const singInwithEmailandPassword = (event) => {
     event.preventDefault();
-if (inputEmail.current.value==="" && inputPassword.current.value==="" ) {
+if (inputEmail.current.value==="" || inputPassword.current.value==="" ) {
  setAlertMesage("Boş bırakıldı gerekli alanları doldurunuz")
   
 }
@@ -40,12 +42,14 @@ else{
         history.push("/")
       })
       .catch((error) => {
+        console.log(error)
+        
         if (error.code ==="auth/wrong-password") {
           setAlertMesage("Üzgünüz, şifren yanlıştı. ")
           
           }
           else if (error.code==="auth/user-not-found") {
-            setAlertMesage("Girdiğin kullanıcı adı bir hesaba ait değil.")
+            setAlertMesage("Girdiğin e-posta adı bir hesaba ait değil.")
             
           }
       });
@@ -58,9 +62,15 @@ else{
     auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
+        
+      
         dispatch(login(authUser));
+        history.push("/")
+        
       }
     });
+
+    
   };
 
   return (
