@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link,useHistory } from "react-router-dom";
 import { auth, providerFacebook, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import alert from "alertifyjs";
@@ -17,6 +17,7 @@ function SingUp() {
   const inputSurname = useRef(null);
   const inputEmail = useRef(null);
   const inputPassword = useRef(null);
+  const history = useHistory();
 
   const singUpPasswordAndEmail = (event) => {
     event.preventDefault();
@@ -39,7 +40,15 @@ else{
               inputName.current.value + " " + inputSurname.current.value,
           });
         })
+        .then((user)=>{
+          alert.success("Hesabınız Oluşturuldu Ana Sayfada Giriş Yapınız");
+          history.push("/")
+          
+
+          
+        })
         .catch((err) => {
+          console.log(err)
           if (err.code ==="auth/invalid-email") {
             alert.error("Desteklenmeyen e-mail şekli")
             
@@ -47,6 +56,11 @@ else{
             else if (err.code ==="auth/weak-password")
             {
               alert.error("6 karakterden uzun şifre giriniz")
+            }
+
+            else if (err.code==="auth/email-already-in-use")
+            {
+              alert.error("Girdiğiniz e-posta kullanılmaktadır")
             }
         });
 }
@@ -61,7 +75,11 @@ else{
     auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
+ 
+       alert.success("Ana Sayfadan Giriş Yapabilirisniz")
         dispatch(login(authUser));
+        
+        
       }
     });
   };

@@ -1,33 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
 import PostAddIcon from "@material-ui/icons/PostAdd";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import alert from "alertifyjs";
 import db from "../firebase";
 import { useRef } from "react";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
+import { auth } from "../firebase";
 function MyAcount() {
   const [modal, setModal] = useState(false);
-  const toggle = () => {setModal(!modal) 
-    setSave(true)};
+  const toggle = () => {
+    setModal(!modal);
+    setSave(true);
+  };
   const addressTile = useRef(null);
   const addressLocation = useRef(null);
   const editaddressTile = useRef(null);
   const editaddressLocation = useRef(null);
+  const nameSurname = useRef(null);
+  const availablePasswordChage = useRef(null);
+  const newPasswordChange = useRef(null);
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const userNameLoc = JSON.parse(localStorage.getItem("userNameLoc"));
-  const [save,setSave] = useState(false)
-  const [defaultTitle , setDefaultTitle] = useState("")
-  const [defaultLocation , setDefaulttLocation ] = useState("")
-  const [itemId , setItemId ] = useState("")
-const [myAddress, setMyAddress] = useState([])
-  const newAddAdress = (event) => {
+  const [save, setSave] = useState(false);
+  const [defaultTitle, setDefaultTitle] = useState("");
+  const [defaultLocation, setDefaulttLocation] = useState("");
+  const [itemId, setItemId] = useState("");
+  const history = useHistory();
+  const [visiChange, setVisiChange] = useState({
+    avaible: false,
+    new: false,
+  });
+  const [myAddress, setMyAddress] = useState([]);
+  const [userLocAcount, setUserLocAcount] = useState({
+    initialName: null,
+    initialSurname: null,
+  });
 
-    if(save===true)
-    {
-      console.log("Kaydet")
+  useEffect(() => {
+    for (let index = 0; index < userNameLoc.length; index++) {
+      const initialName = userNameLoc[0];
+      const element = userNameLoc[index];
+      if (element === " ") {
+        const initialSurname = userNameLoc[index + 1];
+        setUserLocAcount({
+          initialName: initialName,
+          initialSurname: initialSurname,
+        });
+      }
+    }
+  }, []);
+
+  const newAddAdress = (event) => {
+    if (save === true) {
+      console.log("Kaydet");
       event.preventDefault();
-    
+
       const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
       if (
         addressTile.current.value === "" ||
@@ -44,7 +74,7 @@ const [myAddress, setMyAddress] = useState([])
           .doc(uidLoc)
           .collection("addressList")
           .doc(addressTile.current.value);
-  
+
         addCartItems.get().then((doc) => {
           if (doc.exists) {
             alert.error("Böyle Bir Adres Başlığı Bulunmaktadır");
@@ -53,7 +83,7 @@ const [myAddress, setMyAddress] = useState([])
             db.collection("personList")
               .doc(uidLoc)
               .collection("addressList")
-  
+
               .doc(addressTile.current.value)
               .set({
                 addressTitle: addressTile.current.value,
@@ -70,94 +100,118 @@ const [myAddress, setMyAddress] = useState([])
         });
       }
     }
-
-  
-    
   };
 
-
- 
-useEffect(() => {
-  db.collection("personList")
-        .doc(uidLoc)
-        .collection("addressList")
-        .onSnapshot((onSnapshot) => {
-          const addressListItems = [];
-          onSnapshot.forEach((doc) => {
-            addressListItems.push(doc);
-          });
-          setMyAddress(addressListItems);
-        });
-}, [])
-
-
-const deleteMyAdress = (item)=>{
-
-  db.collection("personList")
-        .doc(uidLoc)
-        .collection("addressList")
-        .doc(item.id)
-        .delete()
-        .then(() => {
-          alert.success("Adres Silindi");
-        })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-        });
-
-}
-
-const editAddAdress = (event)=>{
-  event.preventDefault()
-  console.log(itemId)
-  console.log(editaddressTile.current.value)
-  console.log(editaddressLocation.current.value)
-
-  if(editaddressTile.current.value==="" || editaddressLocation.current.value === "")
-  {
-    alert.error("Değiştime işlemi yapmadınız");
-    setModal(!modal)
-  }else if (editaddressLocation.current.value>40)
-  {
-    alert.error("Adressi birazdaha açıklayınız");
-  }
-  else{
+  useEffect(() => {
     db.collection("personList")
-    .doc(uidLoc)
-    .collection("addressList")
-    .doc(itemId)
-    .update({
-      addressTitle:editaddressTile.current.value,
-      addressLocation:editaddressLocation.current.value
-    });
-    setModal(!modal)
+      .doc(uidLoc)
+      .collection("addressList")
+      .onSnapshot((onSnapshot) => {
+        const addressListItems = [];
+        onSnapshot.forEach((doc) => {
+          addressListItems.push(doc);
+        });
+        setMyAddress(addressListItems);
+      });
+  }, []);
 
-  }
+  const deleteMyAdress = (item) => {
+    db.collection("personList")
+      .doc(uidLoc)
+      .collection("addressList")
+      .doc(item.id)
+      .delete()
+      .then(() => {
+        alert.success("Adres Silindi");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+  };
 
+  const editAddAdress = (event) => {
+    event.preventDefault();
+    console.log(itemId);
+    console.log(editaddressTile.current.value);
+    console.log(editaddressLocation.current.value);
 
- 
+    if (
+      editaddressTile.current.value === "" ||
+      editaddressLocation.current.value === ""
+    ) {
+      alert.error("Değiştime işlemi yapmadınız");
+      setModal(!modal);
+    } else if (editaddressLocation.current.value > 40) {
+      alert.error("Adressi birazdaha açıklayınız");
+    } else {
+      db.collection("personList")
+        .doc(uidLoc)
+        .collection("addressList")
+        .doc(itemId)
+        .update({
+          addressTitle: editaddressTile.current.value,
+          addressLocation: editaddressLocation.current.value,
+        });
+      setModal(!modal);
+    }
+  };
+  // açan
+  const editMyAdress = (item) => {
+    setSave(false);
+    setModal(!modal);
+    setDefaultTitle(item.data().addressTitle);
+    setDefaulttLocation(item.data().addressLocation);
+    setItemId(item.id);
+  };
 
-}
-// açan 
-const editMyAdress = (item)=>{
-  setSave(false)
-  setModal(!modal)
-  setDefaultTitle(item.data().addressTitle)
-  setDefaulttLocation(item.data().addressLocation)
-  setItemId(item.id)
+  const saveInfo = (event) => {
+    event.preventDefault();
+    console.log(nameSurname.current.value);
+    console.log(availablePasswordChage.current.value);
+    console.log(newPasswordChange.current.value);
+    var user = auth.currentUser;
+
     
-   
- 
+
+   if (nameSurname.current.value !== "") {
+      user
+        .updateProfile({
+          displayName: nameSurname.current.value,
+        })
+        .then(function () {
+          alert.success("Adınız ve Soyadınız Değiştirildi");
+          history.push("/")
+        })
+        .catch(function (error) {
+          // An error happened.
+        });
+    }
+
+     if (availablePasswordChage.current.value !=="" && newPasswordChange.current.value!=="" )
+    {
 
 
+
+      var newPassword = newPasswordChange.current.value;
+      user.updatePassword(newPassword).then(function(){
+        alert.success("Şifreniz Değiştirildi");
+        history.push("/")
+
+      }).catch(function(error){
+
+      })
+
+    }
+
+    if(availablePasswordChage.current.value ==="" && newPasswordChange.current.value==="" && nameSurname.current.value==="" )
+    {
+      alert.success("Hiçbir değişiklik yapılmamıştır");
+      history.push("/")
+    }
   
 
-  
-  
 
-}
-
-
+  };
 
   return (
     <Wrapper>
@@ -172,7 +226,10 @@ const editMyAdress = (item)=>{
           <span>Hesabım</span>
         </PageTitle>
         <PageHeader>
-          <ProfilImg>EG</ProfilImg>
+          <ProfilImg>
+            {userLocAcount.initialName}
+            {userLocAcount.initialSurname}
+          </ProfilImg>
           <ProfilName>{userNameLoc}</ProfilName>
         </PageHeader>
 
@@ -186,143 +243,194 @@ const editMyAdress = (item)=>{
           </MyInfoDecsContainer>
 
           <MyInfo>
-            <NameSurname>
-              <MyName>
-                <NameLabel>Ad:</NameLabel>
-                <NameInput />
-              </MyName>
-              <MySurname>
-                <SurnameLabel>Soyadı:</SurnameLabel>
-                <SurnameInput />
-              </MySurname>
-            </NameSurname>
-            <MyPassaword>
-              <MyPassawordDesc>
-                <MyPassawordDescTitle>Şifre Değişikliği</MyPassawordDescTitle>
-                <MyPassawordDescSub>
-                  Şifreniz en az bir harf, rakam veya özel karakter içermeli.
-                  Ayrıca şifreniz en az 8 karakterden oluşmalı.
-                </MyPassawordDescSub>
-              </MyPassawordDesc>
+            <form onSubmit={saveInfo}>
+              <NameSurname>
+                <MyName>
+                  <NameLabel>Ad Soyadı:</NameLabel>
+                  <NameInput ref={nameSurname} />
+                </MyName>
+              </NameSurname>
+              <MyPassaword>
+                <MyPassawordDesc>
+                  <MyPassawordDescTitle>Şifre Değişikliği</MyPassawordDescTitle>
+                  <MyPassawordDescSub>
+                    Şifreniz en az bir harf, rakam veya özel karakter içermeli.
+                    Ayrıca şifreniz en az 8 karakterden oluşmalı.
+                  </MyPassawordDescSub>
+                </MyPassawordDesc>
 
-              <AvailablePasswordLabel>Mevcut Şifre</AvailablePasswordLabel>
-              <AvailablePassword type="password" />
+                <ChangePasswordLabel>Mevcut Şifre</ChangePasswordLabel>
+                <AvailablePasswordContainer>
+                  <ChangePassword
+                    type={visiChange.avaible === false ? "password" : "text"}
+                    ref={availablePasswordChage}
+                  />
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() =>
+                      setVisiChange({ avaible: !visiChange.avaible })
+                    }
+                  >
+                    {visiChange.avaible === false ? (
+                      <VisibilityIcon />
+                    ) : (
+                      <VisibilityOffIcon />
+                    )}
+                  </div>
+                </AvailablePasswordContainer>
 
-              <ChangePasswordLabel>Yeni Şifre</ChangePasswordLabel>
-              <ChangePassword type="password" />
-            </MyPassaword>
+                <ChangePasswordLabel>Yeni Şifre</ChangePasswordLabel>
+                <AvailablePasswordContainer>
+                  <ChangePassword
+                    type={visiChange.new === false ? "password" : "text"}
+                    ref={newPasswordChange}
+                  />
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setVisiChange({ new: !visiChange.new })}
+                  >
+                    {visiChange.new === false ? (
+                      <VisibilityIcon />
+                    ) : (
+                      <VisibilityOffIcon />
+                    )}
+                  </div>
+                </AvailablePasswordContainer>
+              </MyPassaword>
 
-            <MyAdressContainer>
-              <MyAdressHeader>
-                <MyAdressTitle>Adreslerim</MyAdressTitle>
+              <MyAdressContainer>
+                <MyAdressHeader>
+                  <MyAdressTitle>Adreslerim</MyAdressTitle>
 
-                <MyAdressSub>
-                  {myAddress.length} teslimat adresiniz bulunmaktadır. Bu sayfadan yeni adres
-                  oluşturabilir, mevcut adreslerinizi düzenleyebilir ya da
-                  silebilirsiniz.
-                </MyAdressSub>
-              </MyAdressHeader>
+                  <MyAdressSub>
+                    {myAddress.length} teslimat adresiniz bulunmaktadır. Bu
+                    sayfadan yeni adres oluşturabilir, mevcut adreslerinizi
+                    düzenleyebilir ya da silebilirsiniz.
+                  </MyAdressSub>
+                </MyAdressHeader>
 
-              <MyAdresss>
-                <MyAdressAdd onClick={toggle}>
-                  <PostAddIcon style={{ fontSize: 100 }} />
-                </MyAdressAdd>
-                {myAddress.map((item)=>(
-                  <MyAdressInfo>
-              
-                  <MyAdressName> {item.data().addressTitle}</MyAdressName>
-                  <MyAdressLocation value={item.data().addressLocation} type="text"/>
-               
-                 
-                  
-                  <Buttons>
-                    <DeleteAdress onClick={()=>deleteMyAdress(item)}>Sil</DeleteAdress>
-                    <EditAdress onClick={()=>editMyAdress(item)}>Düzenle</EditAdress>
-                  </Buttons>
-                </MyAdressInfo>
+                <MyAdresss>
+                  <MyAdressAdd onClick={toggle}>
+                    <PostAddIcon style={{ fontSize: 100 }} />
+                  </MyAdressAdd>
+                  {myAddress.map((item) => (
+                    <MyAdressInfo>
+                      <MyAdressName> {item.data().addressTitle}</MyAdressName>
+                      <MyAdressLocation
+                        value={item.data().addressLocation}
+                        type="text"
+                      />
+
+                      <Buttons>
+                        <DeleteAdress onClick={() => deleteMyAdress(item)}>
+                          Sil
+                        </DeleteAdress>
+                        <EditAdress onClick={() => editMyAdress(item)}>
+                          Düzenle
+                        </EditAdress>
+                      </Buttons>
+                    </MyAdressInfo>
                   ))}
-              
-              </MyAdresss>
-            </MyAdressContainer>
+                </MyAdresss>
+              </MyAdressContainer>
+              <SubmitButton>Kaydet</SubmitButton>
+            </form>
           </MyInfo>
         </MyInfoContainer>
       </MyAccountPage>
-      {save?<div>
-        <Modal isOpen={modal} toggle={toggle}>
-          <ModalHeader toggle={toggle}>Yeni Adress Ekle</ModalHeader>
-          <ModalBody>
-            <form onSubmit={newAddAdress}>
-              <Container>
-                <AddAdressNameLabel>Adres Başlığı:</AddAdressNameLabel>
-                <AddAdressNameInput ref={addressTile} />
+      {save ? (
+        <div>
+          <Modal isOpen={modal} toggle={toggle}>
+            <ModalHeader toggle={toggle}>Yeni Adress Ekle</ModalHeader>
+            <ModalBody>
+              <form onSubmit={newAddAdress}>
+                <Container>
+                  <AddAdressNameLabel>Adres Başlığı:</AddAdressNameLabel>
+                  <AddAdressNameInput ref={addressTile} />
 
-                <AddAdressLocationLabel>Açık Adres:</AddAdressLocationLabel>
-                <AddAdressLocationInput ref={addressLocation} />
-              </Container>
+                  <AddAdressLocationLabel>Açık Adres:</AddAdressLocationLabel>
+                  <AddAdressLocationInput ref={addressLocation} />
+                </Container>
 
-              <Button
-                color="primary"
-                style={{
-                  float: "right",
-                  marginLeft: "30px",
-                  marginTop: "20px",
-                }}
-              >
-              Kaydet
-              
-              </Button>
-              <Button
-                color="secondary"
-                style={{ float: "right", marginTop: "20px" }}
-                onClick={toggle}
-              >
-                İptal Et
-              </Button>
-            </form>
-          </ModalBody>
-          <ModalFooter></ModalFooter>
-        </Modal>
-      </div>:<div>
-      <Modal isOpen={modal} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Adresi Değiştir</ModalHeader>
-        <ModalBody>
-          <form onSubmit={editAddAdress}>
-            <Container>
-              <AddAdressNameLabel>Adres Başlığı:</AddAdressNameLabel>
-              <AddAdressNameInput placeholder={defaultTitle} ref={editaddressTile} />
+                <Button
+                  color="primary"
+                  style={{
+                    float: "right",
+                    marginLeft: "30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Kaydet
+                </Button>
+                <Button
+                  color="secondary"
+                  style={{ float: "right", marginTop: "20px" }}
+                  onClick={toggle}
+                >
+                  İptal Et
+                </Button>
+              </form>
+            </ModalBody>
+            <ModalFooter></ModalFooter>
+          </Modal>
+        </div>
+      ) : (
+        <div>
+          <Modal isOpen={modal} toggle={toggle}>
+            <ModalHeader toggle={toggle}>Adresi Değiştir</ModalHeader>
+            <ModalBody>
+              <form onSubmit={editAddAdress}>
+                <Container>
+                  <AddAdressNameLabel>Adres Başlığı:</AddAdressNameLabel>
+                  <AddAdressNameInput
+                    placeholder={defaultTitle}
+                    ref={editaddressTile}
+                  />
 
-              <AddAdressLocationLabel>Açık Adres:</AddAdressLocationLabel>
-              <AddAdressLocationInput placeholder={defaultLocation} ref={editaddressLocation} />
-            </Container>
+                  <AddAdressLocationLabel>Açık Adres:</AddAdressLocationLabel>
+                  <AddAdressLocationInput
+                    placeholder={defaultLocation}
+                    ref={editaddressLocation}
+                  />
+                </Container>
 
-            <Button
-              color="primary"
-              style={{
-                float: "right",
-                marginLeft: "30px",
-                marginTop: "20px",
-              }}
-            >
-            Düzenle
-            
-            </Button>
-            <Button
-              color="secondary"
-              style={{ float: "right", marginTop: "20px" }}
-              onClick={toggle}
-            >
-              İptal Et
-            </Button>
-          </form>
-        </ModalBody>
-        <ModalFooter></ModalFooter>
-      </Modal>
-    </div>}
+                <Button
+                  color="primary"
+                  style={{
+                    float: "right",
+                    marginLeft: "30px",
+                    marginTop: "20px",
+                  }}
+                >
+                  Düzenle
+                </Button>
+                <Button
+                  color="secondary"
+                  style={{ float: "right", marginTop: "20px" }}
+                  onClick={toggle}
+                >
+                  İptal Et
+                </Button>
+              </form>
+            </ModalBody>
+            <ModalFooter></ModalFooter>
+          </Modal>
+        </div>
+      )}
     </Wrapper>
   );
 }
 
 export default MyAcount;
+
+const ButtonSame = styled.button`
+  border: none;
+  outline-width: 0px;
+  padding: 10px 30px;
+  border-radius: 20px;
+  color: white;
+`;
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -330,9 +438,9 @@ const Wrapper = styled.div`
 `;
 
 const HomaPageTitle = styled.div`
-@media only screen and (max-width:725px){
-  font-size: 30px;
-}
+  @media only screen and (max-width: 725px) {
+    font-size: 30px;
+  }
   margin-top: 50px;
   font-size: 45px;
   color: brown;
@@ -353,11 +461,9 @@ const MyAccountPage = styled.div`
   justify-content: center;
   align-items: center;
   margin-top: 20px;
- 
 `;
 
 const PageTitle = styled.div`
-
   span {
     font-size: 30px;
     color: red;
@@ -377,16 +483,15 @@ const ProfilImg = styled.div`
   font-size: 20px;
   border-radius: 100px;
   background-color: rgb(234, 234, 234);
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     padding: 8px;
-  font-size: 15px;
-}
+    font-size: 15px;
+  }
 `;
 const ProfilName = styled.div`
-  @media only screen and (max-width:725px){
-   
-  font-size: 20px;
-}
+  @media only screen and (max-width: 725px) {
+    font-size: 20px;
+  }
   font-size: 25px;
 `;
 
@@ -398,11 +503,10 @@ const MyInfo = styled.div`
 const NameSurname = styled.div`
   display: flex;
   flex-direction: row;
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     display: flex;
-  flex-direction: column;
-   
-}
+    flex-direction: column;
+  }
 `;
 
 const MyName = styled.div`
@@ -434,7 +538,12 @@ const InputSame = styled.input`
 `;
 
 const NameLabel = styled(LabelSame)``;
-const NameInput = styled(InputSame)``;
+const NameInput = styled(InputSame)`
+  width: 380px;
+  @media only screen and (max-width: 725px) {
+    width: 300px;
+  }
+`;
 const SurnameLabel = styled(LabelSame)``;
 const SurnameInput = styled(InputSame)``;
 const MyInfoDecsContainer = styled.div`
@@ -442,7 +551,6 @@ const MyInfoDecsContainer = styled.div`
   margin-bottom: 20px;
   display: flex;
   flex-direction: column;
-  
 `;
 const MyInfoDecsTitle = styled.span`
   font-size: 20px;
@@ -451,11 +559,9 @@ const MyInfoDecsTitle = styled.span`
 const MyInfoSubDecs = styled.span`
   margin-top: 10px;
   width: 560px;
-  @media only screen and (max-width:725px){
-    width:300px;
-   
-}
- 
+  @media only screen and (max-width: 725px) {
+    width: 300px;
+  }
 `;
 const MyInfoContainer = styled.div`
   display: flex;
@@ -465,15 +571,10 @@ const MyInfoContainer = styled.div`
   border: 2px solid lightgray;
   padding: 30px;
   border-radius: 10px;
-  width:630px;
-  @media only screen and (max-width:725px){
-    width:350px;
-   
-}
-
- 
-  
-  
+  width: 630px;
+  @media only screen and (max-width: 725px) {
+    width: 350px;
+  }
 `;
 
 const MyPassaword = styled.div`
@@ -496,29 +597,45 @@ const MyPassawordDescSub = styled.span`
   margin-top: 10px;
   width: 560px;
   margin-bottom: 20px;
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     width: 300px;
-   
-}
+  }
 `;
 
-const AvailablePassword = styled(InputSame)`
-  margin-bottom: 20px;
+const AvailablePassword = styled.input`
   width: 380px;
-  @media only screen and (max-width:725px){
+  border: none;
+
+  outline-width: 0px;
+  @media only screen and (max-width: 725px) {
     width: 300px;
-   
-}
-  
+  }
 `;
 
 const ChangePassword = styled(InputSame)`
   width: 380px;
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     width: 300px;
-   
-}
+  }
 `;
+
+const AvailablePasswordContainer = styled.div`
+  border: 1px solid lightgray;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 20px;
+  border-radius: 6px;
+  border-left: none;
+  border-top: none;
+  border-bottom: none;
+
+  width: 380px;
+  @media only screen and (max-width: 725px) {
+    width: 300px;
+  }
+`;
+
 const AvailablePasswordLabel = styled(LabelSame)``;
 const ChangePasswordLabel = styled(LabelSame)``;
 
@@ -526,6 +643,19 @@ const MyAdressContainer = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 10px;
+`;
+
+const SubmitButton = styled(ButtonSame)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-left: 240px;
+  margin-top: 30px;
+  background-color: green;
+  @media only screen and (max-width: 725px) {
+    margin-left: 140px;
+  }
 `;
 const MyAdressHeader = styled.div`
   display: flex;
@@ -538,10 +668,9 @@ const MyAdressTitle = styled.span`
 `;
 const MyAdressSub = styled.span`
   width: 580px;
-   @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     width: 300px;
-   
-}
+  }
 `;
 const MyAdresss = styled.div`
   display: flex;
@@ -574,10 +703,9 @@ const MyAdressInfo = styled(MyAdressSame)`
   flex-direction: column;
   justify-content: space-between;
   cursor: default;
- height:280px;
+  height: 280px;
 
-  margin-right:20px;
-
+  margin-right: 20px;
 `;
 
 const MyAdressName = styled.span`
@@ -589,27 +717,18 @@ const MyAdressName = styled.span`
 `;
 
 const MyAdressLocation = styled.textarea`
-display:flex;
-align-items:center;
-justify-content:center;
-width:220px;
-height:200px;
-border:none;
-outline-width:0;
-cursor:pointer;
- 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 220px;
+  height: 200px;
+  border: none;
+  outline-width: 0;
+  cursor: pointer;
 `;
 
 const Buttons = styled.div`
   margin-bottom: 10px;
-`;
-
-const ButtonSame = styled.button`
-  border: none;
-  outline-width: 0px;
-  padding: 10px 30px;
-  border-radius: 20px;
-  color: white;
 `;
 
 const DeleteAdress = styled(ButtonSame)`
