@@ -35,6 +35,7 @@ function CartConfirm() {
   });
   // local bilgisi olmadıığından teslim süresi default verildi
   const [locationTime, setLocationTime] = useState(20);
+  const [adress, setAdress] = useState("");
 
   const [cartConfirmTime, setCartConfirmTime] = useState({
     max: 0,
@@ -102,6 +103,7 @@ function CartConfirm() {
           addressListItems.push(doc.data().addressTitle);
         });
         setMyAddressTitle(addressListItems);
+        
       });
   }, []);
 
@@ -186,13 +188,24 @@ function CartConfirm() {
         minTime: cartConfirmTime.min,
         maxTime: cartConfirmTime.max,
       };
-      cartConfirm.map((item) =>
+      cartConfirm.forEach(element => {
         userInfoServer.summary.push({
-          name: "İsim: " + item.cartConfirmProducData.addCartProductName,
+          name: "İsim: " + element.cartConfirmProducData.addCartProductName,
           quantity:
-            "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
+            "Adet: " + element.cartConfirmProducData.addCartProductQuantity,
         })
-      );
+        
+      });
+
+
+
+      // cartConfirm.map((item) =>
+      //   userInfoServer.summary.push({
+      //     name: "İsim: " + item.cartConfirmProducData.addCartProductName,
+      //     quantity:
+      //       "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
+      //   })
+      // );
       axios
         .post("http://localhost:3005/create", userInfoServer)
         .then(() => console.log("Book Created"))
@@ -209,40 +222,75 @@ function CartConfirm() {
   const cartConfirmClicked = () => {
     setModal(!modal);
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-    cartConfirm.map((item) =>
+    cartConfirm.forEach(element => {
       db
-        .collection("personList")
-        .doc(uidLoc)
-        .collection("cartConfirmList")
-        .doc(item.cartConfirmProductId)
-        .set({
-          cartConfirmListName: item.cartConfirmProducData.addCartProductName,
-          cartConfirmListPrice: item.cartConfirmProducData.addCartProductPrice,
-          cartConfirmListQunatity:
-            item.cartConfirmProducData.addCartProductQuantity,
-          cartConfirmListTime: item.cartConfirmProducData.addCartProductTime,
-          cartConfirmListKin: item.cartConfirmProducData.addCartProductKind,
-        })
-    );
+      .collection("personList")
+      .doc(uidLoc)
+      .collection("cartConfirmList")
+      .doc(element.cartConfirmProductId)
+      .set({
+        cartConfirmListName: element.cartConfirmProducData.addCartProductName,
+        cartConfirmListPrice: element.cartConfirmProducData.addCartProductPrice,
+        cartConfirmListQunatity:
+        element.cartConfirmProducData.addCartProductQuantity,
+        cartConfirmListTime: element.cartConfirmProducData.addCartProductTime,
+        cartConfirmListKin: element.cartConfirmProducData.addCartProductKind,
+      })
+      
+    });
 
-    cartConfirm.map((item) =>
+
+    // cartConfirm.map((item) =>
+    //   db
+    //     .collection("personList")
+    //     .doc(uidLoc)
+    //     .collection("cartConfirmList")
+    //     .doc(item.cartConfirmProductId)
+    //     .set({
+    //       cartConfirmListName: item.cartConfirmProducData.addCartProductName,
+    //       cartConfirmListPrice: item.cartConfirmProducData.addCartProductPrice,
+    //       cartConfirmListQunatity:
+    //         item.cartConfirmProducData.addCartProductQuantity,
+    //       cartConfirmListTime: item.cartConfirmProducData.addCartProductTime,
+    //       cartConfirmListKin: item.cartConfirmProducData.addCartProductKind,
+    //     })
+    // );
+
+
+    cartConfirm.forEach(element => {
       db
         .collection("personList")
         .doc(uidLoc)
         .collection("cartList")
-        .doc(item.cartConfirmProductId)
+        .doc(element.cartConfirmProductId)
         .delete()
-        .then(() => {
+        .then(()=>{
           // console.log("Success");
         })
-        .catch((error) => {
-          console.log(error);
+        .catch((err)=>{
+          console.log(err);
         })
-    );
+      
+    });
+
+    // cartConfirm.map((item) =>
+    //   db
+    //     .collection("personList")
+    //     .doc(uidLoc)
+    //     .collection("cartList")
+    //     .doc(item.cartConfirmProductId)
+    //     .delete()
+    //     .then(() => {
+    //       // console.log("Success");
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     })
+    // );
   };
 
   const classes = useStyles();
-  const [adress, setAdress] = React.useState("");
+  
 
   const handleChange = (event) => {
     setAdress(event.target.value);
@@ -311,8 +359,8 @@ function CartConfirm() {
                       value={adress}
                       onChange={handleChange}
                     >
-                      {myAddressTitle.map((item) => (
-                        <MenuItem value={item}>{item}</MenuItem>
+                      {myAddressTitle.map((item,index) => (
+                        <MenuItem value={item} key={index}>{item}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -347,25 +395,41 @@ function CartConfirm() {
             </div>
 
             <div className="ordersInfo">
-              <div className="ordersTitle">
-                <span>No:</span>
-                <span>Sipariş</span>
-                <span>Fiyat</span>
-              </div>
-              <div className="ordersContainer">
-                {cartConfirm.map((item) => (
-                  <div key={item.cartConfirmProductId}>
-                    <div className="ordersName">
-                      {item.cartConfirmProducData.addCartProductName}
-                    </div>
-                    <div className="ordersPrice">
-                      {item.cartConfirmProducData.addCartProductPrice *
-                        item.cartConfirmProducData.addCartProductQuantity}
-                      .00 ₺
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <table style={{width:"100%"}}>
+            <tr>
+            <th >No:</th>
+            <th>Sipariş:</th>
+            <th>Fiyat:</th>
+          </tr>
+
+          {cartConfirm.map((item,index) => (
+            <tr key={item.cartConfirmProductId}>
+            <td>{index+1}</td>
+              <td className="ordersName">
+                {item.cartConfirmProducData.addCartProductName}
+              </td>
+              <td className="ordersPrice">
+                {item.cartConfirmProducData.addCartProductPrice *
+                  item.cartConfirmProducData.addCartProductQuantity}
+                .00 ₺
+              </td>
+            </tr>
+          ))}
+
+ 
+
+            </table>
+             
+
+
+
+
+           
+          
+          
+      
+               
+            
             </div>
           </OrderUserDec>
         </Order>
@@ -630,6 +694,7 @@ const OrderUserDec = styled.div`
         flex-direction: row;
         margin-left: 15px;
         margin-top: 7px;
+        overflow-x: scroll;
       }
 
       .ordersName {
