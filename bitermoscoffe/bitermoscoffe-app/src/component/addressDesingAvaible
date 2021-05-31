@@ -1,0 +1,45 @@
+  // <div className="orderUserAdress">
+            //   <div className="titleAdress">
+            //     <div>
+            //       <span>Teslimat Adresi</span>
+            //     </div>
+            //     <div>
+            //       <FormControl className={classes.formControl}>
+            //         <InputLabel id="demo-simple-select-label">
+            //           Adreslerim
+            //         </InputLabel>
+            //         <Select
+            //           labelId="demo-simple-select-label"
+            //           id="demo-simple-select"
+            //           value={adress}
+            //           onChange={handleChange}
+            //         >
+            //           {myAddressTitle.map((item,index) => (
+            //             <MenuItem value={item} key={index}>{item}</MenuItem>
+            //           ))}
+            //         </Select>
+            //       </FormControl>
+            //     </div>
+            //   </div>
+            //   {myAddress.length === 0 && (
+            //     <div className="emptyAdress">
+            //       Hiç Bir Adresiniz Bulunmamaktadır.{" "}
+            //       <Link to="/myAcount">Hesabıma</Link> giderek yeni adres
+            //       ekleyiniz
+            //     </div>
+            //   )}
+
+            //   <div className="userAdress">
+            //     {adress === "" ? (
+            //       <div className="adress">Bir Adress giriniz</div>
+            //     ) : (
+            //       <AddressLocations>
+            //         {myAddress.map((item, index) => (
+            //           <AddressLocation key={index}>
+            //             {item.data().addressLocation}
+            //           </AddressLocation>
+            //         ))}
+            //       </AddressLocations>
+            //     )}
+            //   </div>
+            // </div>

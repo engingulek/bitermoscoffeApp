@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { Link,useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { auth, providerFacebook, providerGoogle } from "../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import alert from "alertifyjs";
@@ -9,6 +9,8 @@ import {
   logout,
   selectUser,
 } from "../reduxtoolkit/features/login/loginSlice";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 
 function SingUp() {
   const dispatch = useDispatch();
@@ -21,65 +23,38 @@ function SingUp() {
 
   const singUpPasswordAndEmail = (event) => {
     event.preventDefault();
-if(inputName.current.value === "" ||
-inputSurname.current.value === "" ||
-inputEmail.current.value === "" 
-)
-{
-  alert.error("Boş bırakılan yerleri doldurunuz")
-}
-else{
-  auth
+    if (
+      inputName.current.value === "" ||
+      inputSurname.current.value === "" ||
+      inputEmail.current.value === ""
+    ) {
+      alert.error("Boş bırakılan yerleri doldurunuz");
+    } else {
+      auth
         .createUserWithEmailAndPassword(
-          inputEmail.current.value,
-          inputPassword.current.value
-        )
-        .then(function (result) {
+     inputEmail.current.value,  inputPassword.current.value
+        ).then(function (result) {
           return result.user.updateProfile({
             displayName:
-              inputName.current.value + " " + inputSurname.current.value,
-          });
-        })
-        .then((user)=>{
+          inputName.current.value + " " + inputSurname.current.value,});})
+        .then((user) => {
           alert.success("Hesabınız Oluşturuldu Ana Sayfada Giriş Yapınız");
-          history.push("/")
-          
-
-          
-        })
+          history.push("/");})
         .catch((err) => {
-          console.log(err)
-          if (err.code ==="auth/invalid-email") {
-            alert.error("Desteklenmeyen e-mail şekli")
-            
-            }
-            else if (err.code ==="auth/weak-password")
-            {
-              alert.error("6 karakterden uzun şifre giriniz")
-            }
-
-            else if (err.code==="auth/email-already-in-use")
-            {
-              alert.error("Girdiğiniz e-posta kullanılmaktadır")
-            }
-        });
-}
-
-
-
-
-   
-  };
+          if (err.code === "auth/invalid-email") {
+            alert.error("Desteklenmeyen e-mail şekli");
+          } else if (err.code === "auth/weak-password") {
+            alert.error("6 karakterden uzun şifre giriniz");
+          } else if (err.code === "auth/email-already-in-use") {
+            alert.error("Girdiğiniz e-posta kullanılmaktadır");
+         }});}};
 
   const singUpGoogle = () => {
     auth.signInWithPopup(providerGoogle).catch((error) => console.log("Hata"));
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
- 
-       alert.success("Ana Sayfadan Giriş Yapabilirisniz")
+        alert.success("Ana Sayfadan Giriş Yapabilirisniz");
         dispatch(login(authUser));
-        
-        
       }
     });
   };
@@ -98,7 +73,6 @@ else{
             <span>Sosyal medya ile üye ol </span>
           </div>
           <div className="socialMediaIcon">
-            
             <div className="googleIcon" onClick={singUpGoogle}>
               <img
                 src="https://img-authors.flaticon.com/google.jpg"
@@ -120,18 +94,21 @@ else{
                 id="surname"
                 ref={inputSurname}
               />
+
               <input
                 type="text"
                 placeholder="E-posta Adresi"
                 id="eposta"
                 ref={inputEmail}
               />
+
               <input
                 type="password"
                 placeholder="Şifre"
                 id="password"
                 ref={inputPassword}
               />
+
               <div className="singUpBttn">
                 <button>Üye Ol</button>
               </div>

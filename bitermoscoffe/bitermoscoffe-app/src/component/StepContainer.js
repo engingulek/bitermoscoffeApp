@@ -8,6 +8,8 @@ import Typography from "@material-ui/core/Typography";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { cartConfirmHiddle } from "../reduxtoolkit/features/product/productSlice";
+import { Fragment } from "react";
+import styled from "styled-components"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,14 +40,33 @@ export default function StepContainer() {
   const timeSelector = useSelector((state) => state.productRed);
   console.log(timeSelector.cartConfirmMakeReady)
   console.log(timeSelector.cartConfirmDeliver)
+const date = new Date();
+date.getHours()
 
   
+
+
+
+
+  if (timeSelector.selectTimeHours===date.getHours() || !timeSelector.selectTimeHours )
+  {
+    console.log(timeSelector.selectTimeHours)
+    const timer = setTimeout(()=>{
+      setActiveStep(activeStep+1)
   
+    },timerValue)
+    if(activeStep===4)
+    {
+      clearTimeout(timer)
+    }
+    
+  }
+  else
+  {
+    
+  }
 
-  const timer = setTimeout(()=>{
-    setActiveStep(activeStep+1)
-
-  },timerValue)
+ 
 
 
 
@@ -74,7 +95,7 @@ export default function StepContainer() {
    }
    else if (activeStep===4)
    {
-    clearTimeout(timer)
+    
     dispatch(cartConfirmHiddle(false))
    }
   }, [activeStep])
@@ -84,93 +105,52 @@ export default function StepContainer() {
  
 
 
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-     
-  
-  //     setActiveStep(activeStep+ 1);
-  
-      
-  //   }, 10000);
-  //   if(activeStep===1)
-  //   {
-  //     console.log(activeStep)
-  //     clearTimeout(timer)
-  //   }
-  //   const timer2 = setTimeout(() => {
-     
-  
-  //     setActiveStep(activeStep+ 1);
-  
-      
-  //   }, 5000);
 
-  //   if(activeStep===2)
-  //   {
-  //     console.log(activeStep)
-  //     clearTimeout(timer2)
-  //   }
-  // }, [])
 
-   
+  
 
+
+  
 
  
-  //   const timer = setTimeout(() => {
-  //     let newSkipped = skipped;
-  
-  //     setActiveStep(activeStep + 1);
-  
-  //     setSkipped(newSkipped);
-  //   }, 20000);
-  
-  //   if (activeStep === 1) {
-  //     clearTimeout(timer);
-  //     const timer2 = setTimeout(() => {
-  //       let newSkipped = skipped;
-  
-  //       setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  // console.log(activeStep)
-  //       setSkipped(newSkipped);
-  //     }, 10000);
-  
-  //   if (activeStep ===2) {
-  //       console.log(activeStep)
-  //       setActiveStep(activeStep + 1);
-  //       clearTimeout(timer2);
-      
-       
-  //     }
-  //   } 
-  //   else if (activeStep>1){
-  //     clearTimeout(timer);
-  //   }
-
-  
-
-
-  
-
-  
 
   return (
-    <div className={classes.root}>
-      <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <div>
-        <div>
-          <div></div>
-        </div>
-      </div>
-    </div>
+
+
+<Fragment>
+{timeSelector.selectTimeHours && <OrderTime>Siparişniz {timeSelector.selectTimeHours}:00 hazırlanmaya başlanacaktır</OrderTime>}
+{!timeSelector.selectTimeHours && <div className={classes.root}>
+<Stepper activeStep={activeStep}>
+  {steps.map((label, index) => {
+    const stepProps = {};
+    const labelProps = {};
+    return (
+      
+      <Step key={label} {...stepProps}>
+        <StepLabel {...labelProps}>{label}</StepLabel>
+      </Step>
+    );
+  })}
+</Stepper>
+<div>
+  <div>
+    <div></div>
+  </div>
+</div>
+</div> }
+
+
+</Fragment>
+    
+    
   );
 }
+
+const OrderTime = styled.span`
+color: red;
+display: flex;
+text-align: center;
+font-size: 20px;
+margin-bottom: 10px;
+font-weight: bold;
+`

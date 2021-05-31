@@ -65,3 +65,43 @@ export default function StepContainer() {
           <div className="subtitle">Beğendiklerim</div>
           <div className="productsCount">{favoriList.length} Ürün</div>
         </div>
+
+
+
+
+
+
+
+
+
+        <div >
+        
+          <form  onSubmit={singInwithEmailandPassword}>
+            <EmailInput
+              type="text"
+              placeholder="Email adresinizi giriniz"
+              ref={inputEmail}
+            />
+            <PasswordContainer>
+          
+            <div>
+            <VisibilityIcon/>
+            </div>
+            <Password type="password" placeholder="password" ref={inputPassword} />
+            
+            </PasswordContainer>
+ 
+            
+         
+          <Button >
+          Giriş Yap
+          
+          </Button>
+         
+          </form>
+          
+        
+          
+         
+          
+        </div>
