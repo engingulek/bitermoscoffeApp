@@ -16,17 +16,17 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
-import { cartConfirmTimeReducer } from "../reduxtoolkit/features/product/productSlice";
+import { cartConfirmTimeReducer, selectedDate } from "../reduxtoolkit/features/product/productSlice";
 
 function CartConfirm() {
   const [modal, setModal] = useState(false);
   const [timeModal, setTimeModal] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
-  const [hourss, setHourss] = useState(new Date().getHours() + 1);
-  const [orderTime, setOrderTime] = useState("");
   const time = new Date();
-  const oorderTime = time.setMinutes(time.getHours() + 60);
-  const [date, setDate] = useState(oorderTime);
+  const [orderTime, setOrderTime] = useState({
+    hours:time.getHours() + 1,
+    minute:"00"
+  });
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const [cartConfirm, setCartConfirm] = useState([]);
   const [stepTimer, setStepTimer] = useState({
@@ -42,7 +42,8 @@ function CartConfirm() {
     min: 0,
   });
   const [cartConfirmPrice, setCaetConfirmPrice] = useState(0);
-  const [myAddress, setMyAddress] = useState([]);
+  const [myAdress, setMyAdress] = useState("");
+
   const [myAddressTitle, setMyAddressTitle] = useState([]);
   const a = 0;
 
@@ -58,23 +59,14 @@ function CartConfirm() {
 
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    let time = new Date(date);
-    let hours = time.getHours();
-    let minutes = time.getMinutes();
-    let day = time.getDay();
-    var gunler = [
-      "pazar",
-      "pazartesi",
-      "salı",
-      "çarşamba",
-      "perşembe",
-      "cuma",
-      "cumartesi",
-    ];
 
-    setOrderTime(hours + ":" + minutes + " " + gunler[day]);
-  }, [date]);
+
+
+  // useEffect(() => {
+  //   let time = new Date(date);
+  //   let hours = time.getHours();
+  //   setOrderTime(hours + ":" +"00" + " ");
+  // }, [date]);
 
   useEffect(() => {
     db.collection("personList")
@@ -94,45 +86,64 @@ function CartConfirm() {
   }, []);
 
   useEffect(() => {
-    db.collection("personList")
-      .doc(uidLoc)
-      .collection("addressList")
-      .onSnapshot((onSnapshot) => {
-        const addressListItems = [];
-        onSnapshot.forEach((doc) => {
-          addressListItems.push(doc.data().addressTitle);
-        });
-        setMyAddressTitle(addressListItems);
-        
-      });
-  }, []);
-
-  useEffect(() => {
-    if (adress === "") {
-      db.collection("personList")
-        .doc(uidLoc)
-        .collection("addressList")
-        .onSnapshot((onSnapshot) => {
-          const addressListItems = [];
-          onSnapshot.forEach((doc) => {
-            addressListItems.push(doc);
-          });
-          setMyAddress(addressListItems);
-        });
-    } else {
+    console.log(adress);
+    if (adress !== "") {
       db.collection("personList")
         .doc(uidLoc)
         .collection("addressList")
         .where("addressTitle", "==", adress)
         .onSnapshot((onSnapshot) => {
-          const addressListItems = [];
+          let addressLocation = null;
           onSnapshot.forEach((doc) => {
-            addressListItems.push(doc);
+            addressLocation = doc.data().addressLocation;
           });
-          setMyAddress(addressListItems);
+          setMyAdress(addressLocation);
         });
     }
-  }, [myAddress]);
+
+    // doc.data().addressTitle
+  }, [adress]);
+
+  useEffect(() => {
+    db.collection("personList")
+      .doc(uidLoc)
+      .collection("addressList")
+      .onSnapshot((onSnapshot) => {
+        const addressTitle = [];
+        onSnapshot.forEach((doc) => {
+          addressTitle.push(doc.data().addressTitle);
+        });
+
+        setMyAddressTitle(addressTitle);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   if (adress === "") {
+  //     db.collection("personList")
+  //       .doc(uidLoc)
+  //       .collection("addressList")
+  //       .onSnapshot((onSnapshot) => {
+  //         const addressListItems = [];
+  //         onSnapshot.forEach((doc) => {
+  //           addressListItems.push(doc);
+  //         });
+  //         setMyAddress(addressListItems);
+  //       });
+  //   } else {
+  //     db.collection("personList")
+  //       .doc(uidLoc)
+  //       .collection("addressList")
+  //       .where("addressTitle", "==", adress)
+  //       .onSnapshot((onSnapshot) => {
+  //         const addressListItems = [];
+  //         onSnapshot.forEach((doc) => {
+  //           addressListItems.push(doc);
+  //         });
+  //         setMyAddress(addressListItems);
+  //       });
+  //   }
+  // }, [myAddress]);
 
   useEffect(() => {
     let countPrice = 0;
@@ -143,7 +154,10 @@ function CartConfirm() {
       countPrice +=
         element.cartConfirmProducData.addCartProductPrice *
         element.cartConfirmProducData.addCartProductQuantity;
-      countTime.push(element.cartConfirmProducData.addCartProductTime*element.cartConfirmProducData.addCartProductQuantity);
+      countTime.push(
+        element.cartConfirmProducData.addCartProductTime *
+          element.cartConfirmProducData.addCartProductQuantity
+      );
     });
 
     // cartConfirm.map((item) => {
@@ -162,7 +176,11 @@ function CartConfirm() {
       max: Math.max(...countTime) + locationTime + 15,
     });
 
-    setStepTimer({ makeReady: Math.max(...countTime)===0?10:Math.max(...countTime)===0, deliver: locationTime });
+    setStepTimer({
+      makeReady:
+        Math.max(...countTime) === 0 ? 10 : Math.max(...countTime) === 0,
+      deliver: locationTime,
+    });
 
     // console.log(countPrice)
     // console.log(countTime)
@@ -188,16 +206,13 @@ function CartConfirm() {
         minTime: cartConfirmTime.min,
         maxTime: cartConfirmTime.max,
       };
-      cartConfirm.forEach(element => {
+      cartConfirm.forEach((element) => {
         userInfoServer.summary.push({
           name: "İsim: " + element.cartConfirmProducData.addCartProductName,
           quantity:
             "Adet: " + element.cartConfirmProducData.addCartProductQuantity,
-        })
-        
+        });
       });
-
-
 
       // cartConfirm.map((item) =>
       //   userInfoServer.summary.push({
@@ -213,8 +228,8 @@ function CartConfirm() {
           console.error(err);
         });
       setModal(!modal);
-  
-      console.log(stepTimer)
+
+      console.log(stepTimer);
       dispatch(cartConfirmTimeReducer(stepTimer));
     }
   };
@@ -222,23 +237,21 @@ function CartConfirm() {
   const cartConfirmClicked = () => {
     setModal(!modal);
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-    cartConfirm.forEach(element => {
-      db
-      .collection("personList")
-      .doc(uidLoc)
-      .collection("cartConfirmList")
-      .doc(element.cartConfirmProductId)
-      .set({
-        cartConfirmListName: element.cartConfirmProducData.addCartProductName,
-        cartConfirmListPrice: element.cartConfirmProducData.addCartProductPrice,
-        cartConfirmListQunatity:
-        element.cartConfirmProducData.addCartProductQuantity,
-        cartConfirmListTime: element.cartConfirmProducData.addCartProductTime,
-        cartConfirmListKin: element.cartConfirmProducData.addCartProductKind,
-      })
-      
+    cartConfirm.forEach((element) => {
+      db.collection("personList")
+        .doc(uidLoc)
+        .collection("cartConfirmList")
+        .doc(element.cartConfirmProductId)
+        .set({
+          cartConfirmListName: element.cartConfirmProducData.addCartProductName,
+          cartConfirmListPrice:
+            element.cartConfirmProducData.addCartProductPrice,
+          cartConfirmListQunatity:
+            element.cartConfirmProducData.addCartProductQuantity,
+          cartConfirmListTime: element.cartConfirmProducData.addCartProductTime,
+          cartConfirmListKin: element.cartConfirmProducData.addCartProductKind,
+        });
     });
-
 
     // cartConfirm.map((item) =>
     //   db
@@ -256,21 +269,18 @@ function CartConfirm() {
     //     })
     // );
 
-
-    cartConfirm.forEach(element => {
-      db
-        .collection("personList")
+    cartConfirm.forEach((element) => {
+      db.collection("personList")
         .doc(uidLoc)
         .collection("cartList")
         .doc(element.cartConfirmProductId)
         .delete()
-        .then(()=>{
+        .then(() => {
           // console.log("Success");
         })
-        .catch((err)=>{
+        .catch((err) => {
           console.log(err);
-        })
-      
+        });
     });
 
     // cartConfirm.map((item) =>
@@ -290,11 +300,18 @@ function CartConfirm() {
   };
 
   const classes = useStyles();
-  
 
   const handleChange = (event) => {
     setAdress(event.target.value);
   };
+
+  const onChangeDate = (date)=>{
+    setOrderTime({
+      hours:date.getHours(),
+      minute:"00"
+    })
+    dispatch(selectedDate(orderTime))
+  }
 
   return (
     <Wrapper>
@@ -335,7 +352,7 @@ function CartConfirm() {
                       <label htmlFor="time">Zaman Belirleme</label>
                     </div>
                     <div className="defaultDeliveryTime">
-                      <span>{"   Geçerli Zaman  " + orderTime}</span>
+                      <span>{"   Geçerli Zaman  " + orderTime.hours+":00"}</span>
                     </div>
                   </div>
                 </form>
@@ -359,35 +376,35 @@ function CartConfirm() {
                       value={adress}
                       onChange={handleChange}
                     >
-                      {myAddressTitle.map((item,index) => (
-                        <MenuItem value={item} key={index}>{item}</MenuItem>
+                      {myAddressTitle.map((item, index) => (
+                        <MenuItem value={item} key={index}>
+                          {item}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
                 </div>
               </div>
-              {myAddress.length === 0 && (
-                <div className="emptyAdress">
-                  Hiç Bir Adresiniz Bulunmamaktadır.{" "}
-                  <Link to="/myAcount">Hesabıma</Link> giderek yeni adres
-                  ekleyiniz
-                </div>
-              )}
+
+              {/*
+              Address empty in accouny
+              myAddress.length === 0 && (
+            //   <div className="emptyAdress">
+            //     Hiç Bir Adresiniz Bulunmamaktadır.{" "}
+            //     <Link to="/myAcount">Hesabıma</Link> giderek yeni adres
+            //     ekleyiniz
+            //   </div>
+  // )*/}
 
               <div className="userAdress">
                 {adress === "" ? (
-                  <div className="adress">Bir Adress giriniz</div>
+                  <div className="adress">Bir Adres Seçiniz</div>
                 ) : (
-                  <AddressLocations>
-                    {myAddress.map((item, index) => (
-                      <AddressLocation key={index}>
-                        {item.data().addressLocation}
-                      </AddressLocation>
-                    ))}
-                  </AddressLocations>
+                  <AddressLocations>{myAdress}</AddressLocations>
                 )}
               </div>
             </div>
+
             <div style={{ marginTop: "20px" }}>
               <span style={{ fontSize: "20px", fontWeight: "600" }}>
                 Siparişleriniz
@@ -395,41 +412,27 @@ function CartConfirm() {
             </div>
 
             <div className="ordersInfo">
-            <table style={{width:"100%"}}>
-            <tr>
-            <th >No:</th>
-            <th>Sipariş:</th>
-            <th>Fiyat:</th>
-          </tr>
+              <table style={{ width: "100%" }}>
+                <tr>
+                  <th>No:</th>
+                  <th>Sipariş:</th>
+                  <th>Fiyat:</th>
+                </tr>
 
-          {cartConfirm.map((item,index) => (
-            <tr key={item.cartConfirmProductId}>
-            <td>{index+1}</td>
-              <td className="ordersName">
-                {item.cartConfirmProducData.addCartProductName}
-              </td>
-              <td className="ordersPrice">
-                {item.cartConfirmProducData.addCartProductPrice *
-                  item.cartConfirmProducData.addCartProductQuantity}
-                .00 ₺
-              </td>
-            </tr>
-          ))}
-
- 
-
-            </table>
-             
-
-
-
-
-           
-          
-          
-      
-               
-            
+                {cartConfirm.map((item, index) => (
+                  <tr key={item.cartConfirmProductId}>
+                    <td>{index + 1}</td>
+                    <td className="ordersName">
+                      {item.cartConfirmProducData.addCartProductName}
+                    </td>
+                    <td className="ordersPrice">
+                      {item.cartConfirmProducData.addCartProductPrice *
+                        item.cartConfirmProducData.addCartProductQuantity}
+                      .00 ₺
+                    </td>
+                  </tr>
+                ))}
+              </table>
             </div>
           </OrderUserDec>
         </Order>
@@ -474,15 +477,18 @@ function CartConfirm() {
         >
           <DatePicker
             selected={startDate}
-            onChange={(date) => setDate(date)}
-            locale="pt-TR"
+            onChange={(date) => onChangeDate(date)}
+           
             showTimeSelect
             timeFormat="HH:mm"
             timeIntervals={60}
             dateFormat="Pp"
             inline
-            minTime={setHours(setMinutes(new Date(), a), hourss)}
-            maxTime={setHours(setMinutes(new Date(), 30), 23)}
+            minTime={setHours(
+              setMinutes(new Date(), 0),
+              new Date().getHours() + 1
+            )}
+            maxTime={setHours(setMinutes(new Date(), 0), 21)}
             minDate={new Date()}
             maxDate={new Date()}
           />
@@ -504,7 +510,6 @@ const CartConfirmContainer = styled.div`
 `;
 const HeaderContainer = styled.div`
   width: 100%;
-
   background-color: #6f4e37;
   padding: 15px 20px;
   display: flex;
@@ -520,7 +525,6 @@ const HeaderContainer = styled.div`
     display: flex;
     flex-direction: column;
   }
-
   .pageTitle {
     span {
       color: white;
@@ -579,15 +583,12 @@ const OrderDec = styled.div`
       margin-top: 30px;
       div {
         font-size: 18px;
-
         label {
           margin-left: 20px;
-
           :hover {
             cursor: pointer;
           }
         }
-
         input {
           font-size: 19px;
           :hover {
@@ -615,7 +616,6 @@ const OrderDec = styled.div`
     }
     .add {
       width: 100%;
-
       height: 100%;
       border: 2px solid #6f4e37;
       border-radius: 5px;
@@ -635,7 +635,6 @@ const AddressLocation = styled.textarea`
   font-size: 18px;
   outline-width: 0px;
   border: none;
-
   @media only screen and (max-width: 725px) {
     display: flex;
     flex-direction: column;
@@ -651,14 +650,12 @@ const OrderUserDec = styled.div`
     .titleAdress {
       display: flex;
       align-items: center;
-
       span {
         margin-right: 20px;
         font-size: 20px;
         font-weight: 600;
       }
     }
-
     .userAdress {
       width: 300px;
       height: 100%;
@@ -668,7 +665,6 @@ const OrderUserDec = styled.div`
       @media only screen and (max-width: 725px) {
         width: 100%;
       }
-
       .adress {
         .addressLocation {
           @media only screen and (max-width: 725px) {
@@ -678,13 +674,11 @@ const OrderUserDec = styled.div`
       }
     }
   }
-
   .ordersInfo {
     font-size: 17px;
     font-weight: 600px;
     margin-top: 10px;
     width: 100%;
-
     border: 2px solid #6f4e37;
     padding: 10px 20px;
     border-radius: 5px;
@@ -696,7 +690,6 @@ const OrderUserDec = styled.div`
         margin-top: 7px;
         overflow-x: scroll;
       }
-
       .ordersName {
         margin-left: 30px;
       }
@@ -705,7 +698,6 @@ const OrderUserDec = styled.div`
       }
     }
   }
-
   .ordersTitle {
     display: flex;
     flex-direction: row;

@@ -4,6 +4,7 @@ import styled from "styled-components";
 import db from "../firebase";
 import alert from "alertifyjs";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
+import { Fragment } from "react";
 
 function Card() {
   const [products, setProduct] = useState([]);
@@ -22,11 +23,7 @@ function Card() {
           });
           setProduct(productItems);
         });
-    } 
-
- 
-    
-    else {
+    } else {
       db.collection("products").onSnapshot((onSnapshot) => {
         const productItems = [];
         onSnapshot.forEach((doc) => {
@@ -35,24 +32,23 @@ function Card() {
         setProduct(productItems);
       });
     }
-  }, [menuSelector.menuInfo.menuTitleId,menuSelector.searchInfo]);
-
+  }, [menuSelector.menuInfo.menuTitleId, menuSelector.searchInfo]);
 
   useEffect(() => {
-    db.collection("products").onSnapshot((onSnapshot)=>{
+    db.collection("products").onSnapshot((onSnapshot) => {
       const productItems = [];
       onSnapshot.forEach((doc) => {
         productItems.push(doc);
-        const filterProducutName = productItems.filter((product=>{
-          return product.data().productName.toLowerCase().includes(menuSelector.searchInfo.toLowerCase())
-        }))
+        const filterProducutName = productItems.filter((product) => {
+          return product
+            .data()
+            .productName.toLowerCase()
+            .includes(menuSelector.searchInfo.toLowerCase());
+        });
         setProduct(filterProducutName);
       });
-
-    })
-  }, [menuSelector.searchInfo])
-
-
+    });
+  }, [menuSelector.searchInfo]);
 
   useEffect(() => {
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
@@ -113,8 +109,6 @@ function Card() {
     }
   };
 
-
-
   const addFavoriList = (addItem) => {
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     if (uidLoc === null) {
@@ -153,17 +147,12 @@ function Card() {
   };
 
   return (
-    <Wrapper>
+    <Fragment>
       {products.map((item) => (
         <CardContainer>
-          <ProductImg>
-            <div>
-              <img src={item.data().img} alt="kahve" />
-            </div>
-          </ProductImg>
-          <ProductName>
-            <span>{item.data().productName}</span>
-          </ProductName>
+          <ProductImg src={item.data().img} alt={item.data().productName} />
+
+          <ProductName>{item.data().productName}</ProductName>
           <ProductType>
             <div className="makeTime">
               <span>Hazırlanış Süresi : {item.data().time}</span>
@@ -179,14 +168,12 @@ function Card() {
             <span>{item.data().price} ₺</span>
             <span>{item.data().kind}</span>
           </ProductCount>
-          <ProductBttn>
-            <div onClick={() => addProducttoCart(item)}>
-              <button>Sepete Ekle</button>
-            </div>
+          <ProductBttn onClick={() => addProducttoCart(item)}>
+            Sepete Ekle
           </ProductBttn>
         </CardContainer>
       ))}
-    </Wrapper>
+    </Fragment>
   );
 }
 
@@ -218,44 +205,33 @@ const CardContainer = styled.div`
       visibility: visible;
     }
   }
-  @media only screen and (max-width:725px){
+  @media only screen and (max-width: 725px) {
     width: 240px;
-
-  }
-
-
-
-
-`;
-const ProductImg = styled.div`
-    @media only screen and (max-width:725px){
-    width: 100%;
-
-  }
-  div {
-    img {
-      width: 200px;
-      height: 200px;
-      border-radius: 15px;
-      @media only screen and (max-width:725px){
-    
-
-  }
-    
-    }
-
-    display: flex;
-    justify-content: center;
   }
 `;
-const ProductName = styled.div`
+const ProductImg = styled.img`
+  @media only screen and (max-width: 725px) {
+    width: 200px;
+    margin-left: 15px;
+  }
+
+  margin-left: 55px;
+  width: 200px;
+  height: 200px;
+  border-radius: 15px;
+  @media only screen and (max-width: 725px) {
+  }
+
+  display: flex;
+  justify-content: center;
+`;
+const ProductName = styled.span`
   padding-top: 10px;
-  span {
-    font-weight: bolder;
-    font-size: 20px;
-    display: flex;
-    justify-content: center;
-  }
+
+  font-weight: bolder;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
 `;
 const ProductType = styled.div`
   display: flex;
@@ -293,30 +269,30 @@ const ProductCount = styled.div`
   }
   padding-top: 10px;
 `;
-const ProductBttn = styled.div`
-  div {
-    display: flex;
-    justify-content: center;
-    /* visibility: hidden; */
-    margin-top: 5px;
+const ProductBttn = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 55px;
+  /* visibility: hidden; */
+  margin-top: 5px;
+  width: 190px;
 
-    button {
-      border: none;
-      outline: none;
-      outline-style: none;
-      padding: 14px;
-      padding-right: 35px;
-      padding-left: 35px;
-      border-radius: 10px;
-      background-color: white;
-      color: #fc8621;
-      border: 1px solid #fc8621;
-      :hover {
-        background-color: #fc8621;
-        color: white;
-      }
-    }
+  border: none;
+  outline: none;
+  outline-style: none;
+  padding: 14px;
+  padding-right: 35px;
+  padding-left: 35px;
+  border-radius: 10px;
+  background-color: white;
+  color: #fc8621;
+  border: 1px solid #fc8621;
+  :hover {
+    background-color: #fc8621;
+    color: white;
   }
+
   padding-top: 10px;
 `;
 
