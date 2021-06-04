@@ -11,11 +11,13 @@ import db from "./firebase";
 import FavoriList from "./component/FavoriList";
 import MyAcount from "./component/MyAcount";
 import PastOrder from "./component/PastOrder";
+import Message from "./component/Message";
 
 function App() {
   return (
     <div className="app">
       <BrowserRouter>
+      
         <Switch>
           <Route exact path="/">
             <div className="mainPage">
@@ -56,6 +58,10 @@ function App() {
           <PastOrder/>
           </Route>
         </Switch>
+        <div className="message">
+        <Message/>
+          </div>
+    
       </BrowserRouter>
     </div>
   );
