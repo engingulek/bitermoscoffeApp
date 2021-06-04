@@ -71,10 +71,9 @@ function CartConfirm() {
   useEffect(() => {
     db.collection("personList")
       .doc(uidLoc)
-      .collection("cartList")
+      .collection("cartList").orderBy("","desc")
       .onSnapshot((onSnapshot) => {
         const cartConfirmItem = [];
-        const cartConfirmItemPrice = 0;
         onSnapshot.forEach((doc) => {
           cartConfirmItem.push({
             cartConfirmProductId: doc.id,
