@@ -16,6 +16,7 @@ import {
   cartLogin,
 } from "../reduxtoolkit/features/login/loginSlice";
 import { menuSelected, serachSelected } from "../reduxtoolkit/features/menu/menuSlice";
+import { auth } from "../firebase";
 
 function Header() {
   const [inputChanges, setInputChange] = useState(false);
@@ -67,6 +68,18 @@ function Header() {
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
   const userEmailLoc = localStorage.getItem("userEmailLoc");
   const uidLocOut = JSON.parse(localStorage.getItem("uidLocOut"));
+
+
+  useEffect(() => {
+    var user = auth.currentUser;
+    if(user!==null)
+    {
+      localStorage.setItem("userNameLoc", JSON.stringify(user.displayName));
+    }
+  
+
+   
+  }, [])
 
   useEffect(() => {
     localStarnge();

@@ -6,7 +6,7 @@ import alert from "alertifyjs";
 import db from "../firebase";
 import StepContainer from "./StepContainer";
 import { cartConfirmHiddle } from "../reduxtoolkit/features/product/productSlice";
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 function Cart() {
   const [locId, setlocId] = useState("");
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
@@ -72,7 +72,7 @@ function Cart() {
             cartPastOrderListPrice: item.data().cartConfirmListPrice,
             cartPastOrderListQunatity: item.data().cartConfirmListQunatity,
             cartPastOrderListTime: item.data().cartConfirmListTime,
-            cartPastOrderListKind:item.data().cartConfirmListKin
+            cartPastOrderListKind: item.data().cartConfirmListKin,
           })
       );
 
@@ -120,17 +120,14 @@ function Cart() {
         .catch((error) => {
           console.error("Error removing document: ", error);
         });
-    }
-
-    else{
+    } else {
       db.collection("personList")
-      .doc(uidLoc)
-      .collection("cartList")
-      .doc(item.id)
-      .update({
-        addCartProductQuantity: item.data().addCartProductQuantity -1,
-      });
-
+        .doc(uidLoc)
+        .collection("cartList")
+        .doc(item.id)
+        .update({
+          addCartProductQuantity: item.data().addCartProductQuantity - 1,
+        });
     }
   };
 
@@ -187,25 +184,28 @@ function Cart() {
                       </span>
                     </div>
                     <div className="makeTime">
-                      <div className="totalTime">
-                        <span>{item.data().addCartProductTime + 15} dk </span>
-                      </div>
                       <div className="deliveryAndMakeTime">
                         <span>
-                          Hazırlanış: {item.data().addCartProductTime} <br />
-                          Teslimat: 15dk
+                          Hazırlanış:{" "}
+                          {item.data().addCartProductTime *
+                            item.data().addCartProductQuantity}{" "}
+                          <br />
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="remove">
-                  {item.data().addCartProductQuantity===1?<DeleteForeverIcon
-                    onClick={() => addClicReduce(item)}
-                    />:
-                    <div className="reduce" onClick={() => addClicReduce(item)} >
-                    -
-                  </div>}
-                   
+                    {item.data().addCartProductQuantity === 1 ? (
+                      <DeleteForeverIcon onClick={() => addClicReduce(item)} />
+                    ) : (
+                      <div
+                        className="reduce"
+                        onClick={() => addClicReduce(item)}
+                      >
+                        -
+                      </div>
+                    )}
+
                     <div className="count">
                       {item.data().addCartProductQuantity}
                     </div>
