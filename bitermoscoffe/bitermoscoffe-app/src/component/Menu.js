@@ -4,6 +4,7 @@ import db from "../firebase";
 import { useDispatch } from "react-redux";
 import { menuSelected } from "../reduxtoolkit/features/menu/menuSlice";
 import styled from "styled-components"
+
 function Menu() {
   const [menu, setMenu] = useState([]);
    const dispatch = useDispatch()
@@ -14,18 +15,9 @@ function Menu() {
       onSnapshot.forEach((doc) => {
         menuItem.push({
         menuTitleId:doc.id,
-         menuTitles: doc.data()
-        
-        });
-        
-      },[]);
+         menuTitles: doc.data()});
+        },[]);
       setMenu(menuItem);
-
-
-      
-      
-      
-      
     });
 
 
@@ -42,9 +34,8 @@ const menuClicked=(menuItems)=>{
     <Wrapper>
     <Container>
     <MenuItem>
-    <FirstItem>
-    Ismarla
-    </FirstItem>
+   
+   
 
     {menu.map((menuItems) => (
       <OtherItem onClick={()=>menuClicked(menuItems)}>

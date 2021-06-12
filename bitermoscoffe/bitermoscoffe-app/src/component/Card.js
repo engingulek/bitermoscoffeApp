@@ -9,7 +9,7 @@ import { Fragment } from "react";
 function Card() {
   const [products, setProduct] = useState([]);
   const [cartConfrim, setCartConfirm] = useState([]);
-  const [cartConfirmListStatu, setCartConfirmListStatu] = useState(false);
+
   const menuSelector = useSelector((state) => state.menuRed);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ function Card() {
         setProduct(productItems);
       });
     }
-  }, [menuSelector.menuInfo.menuTitleId, menuSelector.searchInfo]);
+  }, [menuSelector.menuInfo.menuTitleId]);
 
   useEffect(() => {
     db.collection("products").onSnapshot((onSnapshot) => {

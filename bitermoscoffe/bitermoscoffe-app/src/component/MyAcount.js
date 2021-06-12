@@ -243,7 +243,7 @@ function MyAcount() {
           </MyInfoDecsContainer>
 
           <MyInfo>
-            <form onSubmit={saveInfo}>
+            
               <NameSurname>
                 <MyName>
                   <NameLabel>Ad Soyadı:</NameLabel>
@@ -331,10 +331,11 @@ function MyAcount() {
                       </Buttons>
                     </MyAdressInfo>
                   ))}
+              
                 </MyAdresss>
               </MyAdressContainer>
-              <SubmitButton>Kaydet</SubmitButton>
-            </form>
+              <SubmitButton onClick={saveInfo}>Kaydet</SubmitButton>
+          
           </MyInfo>
         </MyInfoContainer>
       </MyAccountPage>

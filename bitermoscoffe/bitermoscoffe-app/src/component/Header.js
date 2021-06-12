@@ -175,7 +175,7 @@ function Header() {
                         <span>{userNameLoc}</span>
                       </div>
                       <div className="userNumber">
-                        <span>telefonNumarası</span>
+                        <span className="a">telefonNumarası</span>
                       </div>
                     </div>
                   </div>

@@ -114,7 +114,9 @@
 
 .userNumber > span {
   font-size: 13px;
+  color: rgb(201, 201, 201);
 }
+
 
 .userMore > ol {
   margin-top: 10px;

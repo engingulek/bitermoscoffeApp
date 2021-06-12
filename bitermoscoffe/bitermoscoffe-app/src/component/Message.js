@@ -11,6 +11,7 @@ const Message = () => {
   const [myMessageDb, setMyMessageDb] = useState("");
   const [messageId, setMessageId] = useState(0);
 const [addMessage,setAddMyMessage] = useState([])
+
   const toggle = () =>{
     const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
     if(uidLoc===null)
@@ -22,21 +23,27 @@ alert.error("Giriş Yapmadan Yardım Alamazsınız")
    
 
   } ;
-const sendHours = new Date().setUTCHours()
+
 useEffect(() => {
+
   const uidLoc = JSON.parse(localStorage.getItem("uidLoc"));
-  db.collection("message")
-      .doc(uidLoc)
-      .collection("myMessage").onSnapshot((onSnapshot)=>{
-       const messageData = [];
-        onSnapshot.forEach((doc)=>{
-          messageData.push({
-            myMessageId:doc.id,
-            myMessageText:doc.data()
-          })
+  if(uidLoc!==null)
+  {
+    db.collection("message")
+    .doc(uidLoc)
+    .collection("myMessage").onSnapshot((onSnapshot)=>{
+     const messageData = [];
+      onSnapshot.forEach((doc)=>{
+        messageData.push({
+          myMessageId:doc.id,
+          myMessageText:doc.data(),
+
         })
-        setAddMyMessage(messageData)
       })
+      setAddMyMessage(messageData)
+    })
+  }
+
      
 
 }, [messageId])
@@ -78,7 +85,11 @@ useEffect(() => {
             {addMessage.map((messageText)=>(
               <Fragment>
                 {parseInt(messageText.myMessageId)%2!==0 ? <CustomerSupport>{messageText.myMessageText.message}</CustomerSupport>:
-              <MyMessage> {messageText.myMessageText.message} </MyMessage>  }
+              <MyMessage> 
+                <TextMessage> {messageText.myMessageText.message} </TextMessage>
+               
+              <SendHour>  {messageText.myMessageHour}   </SendHour>
+               </MyMessage>  }
   
 
               </Fragment>
@@ -153,7 +164,7 @@ const MessageSendSection = styled.section`
  
 `;
 
-const MyMessage = styled.span`
+const MyMessage = styled.section`
   margin-left: 170px;
   width: 300px;
   margin-top: 20px;
@@ -162,7 +173,18 @@ const MyMessage = styled.span`
   padding: 5px 15px;
   background-color: lightgray;
   color: black;
+  display: flex ;
+  flex-direction: column;
 `;
+const TextMessage = styled.span`
+
+`
+
+const SendHour = styled.span`
+ margin-left: 230px;
+
+`
+
 
 const CustomerSupport = styled.span`
   width: 300px;

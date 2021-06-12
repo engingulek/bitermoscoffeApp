@@ -12,6 +12,7 @@ import FavoriList from "./component/FavoriList";
 import MyAcount from "./component/MyAcount";
 import PastOrder from "./component/PastOrder";
 import Message from "./component/Message";
+import HelperMessage from "./component/HelperMessage";
 
 function App() {
   return (
@@ -57,6 +58,10 @@ function App() {
           </Route>
           <Route path="/pastOrder">
           <PastOrder/>
+          </Route>
+          <Route path="/helper">
+
+            <HelperMessage/>
           </Route>
         </Switch>
         <div className="message">

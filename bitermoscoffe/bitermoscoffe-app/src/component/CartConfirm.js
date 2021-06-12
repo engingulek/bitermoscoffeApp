@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import setHours from "date-fns/setHours";
 import setMinutes from "date-fns/setMinutes";
 import addMonths from "date-fns/addMonths";
@@ -46,6 +46,7 @@ function CartConfirm() {
 
   const [myAddressTitle, setMyAddressTitle] = useState([]);
   const a = 0;
+  const [openToServer,setOpenToServe]= useState(false)
 
   const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -71,7 +72,7 @@ function CartConfirm() {
   useEffect(() => {
     db.collection("personList")
       .doc(uidLoc)
-      .collection("cartList").orderBy("","desc")
+      .collection("cartList")
       .onSnapshot((onSnapshot) => {
         const cartConfirmItem = [];
         onSnapshot.forEach((doc) => {
@@ -194,7 +195,7 @@ function CartConfirm() {
   };
 
   const orderClicled = () => {
-    if (adress === "") {
+    if (myAdress.length === 0) {
       alert.error("Adress Seçimi Yapmadan Sipariş Veremezsiniz");
     } else {
       const email = JSON.parse(localStorage.getItem("userEmailLoc"));
@@ -205,21 +206,31 @@ function CartConfirm() {
         minTime: cartConfirmTime.min,
         maxTime: cartConfirmTime.max,
       };
-      cartConfirm.forEach((element) => {
-        userInfoServer.summary.push({
-          name: "İsim: " + element.cartConfirmProducData.addCartProductName,
-          quantity:
-            "Adet: " + element.cartConfirmProducData.addCartProductQuantity,
-        });
-      });
+    
 
-      // cartConfirm.map((item) =>
-      //   userInfoServer.summary.push({
-      //     name: "İsim: " + item.cartConfirmProducData.addCartProductName,
-      //     quantity:
-      //       "Adet: " + item.cartConfirmProducData.addCartProductQuantity,
-      //   })
-      // );
+    
+      if(orderTime!==null)
+      {
+        cartConfirm.forEach((element) => {
+          userInfoServer.summary.push({
+            name: "İsim: " + element.cartConfirmProducData.addCartProductName,
+            quantity:
+              "Adet: " + element.cartConfirmProducData.addCartProductQuantity,
+              time:"Sipariş Hazırlanma Saati" + orderTime
+          });
+        });
+
+      }else{
+        cartConfirm.forEach((element) => {
+          userInfoServer.summary.push({
+            name: "İsim: " + element.cartConfirmProducData.addCartProductName,
+            quantity:
+              "Adet: " + element.cartConfirmProducData.addCartProductQuantity,
+          });
+        });
+      }
+
+
       axios
         .post("http://localhost:3005/create", userInfoServer)
         .then(() => console.log("Book Created"))
@@ -312,6 +323,8 @@ function CartConfirm() {
     dispatch(selectedDate(orderTime))
   }
 
+  
+
   return (
     <Wrapper>
       <CartConfirmContainer>
@@ -364,6 +377,7 @@ function CartConfirm() {
                 <div>
                   <span>Teslimat Adresi</span>
                 </div>
+                <Button onClick={()=>setOpenToServe(!openToServer)} >Ismarla</Button>
                 <div>
                   <FormControl className={classes.formControl}>
                     <InputLabel id="demo-simple-select-label">
@@ -384,23 +398,30 @@ function CartConfirm() {
                   </FormControl>
                 </div>
               </div>
-
-              {/*
-              Address empty in accouny
-              myAddress.length === 0 && (
-            //   <div className="emptyAdress">
-            //     Hiç Bir Adresiniz Bulunmamaktadır.{" "}
-            //     <Link to="/myAcount">Hesabıma</Link> giderek yeni adres
-            //     ekleyiniz
-            //   </div>
-  // )*/}
+              {myAddressTitle.length===0?
+                <div className="emptyAdress">
+              Hiç Bir Adresiniz Bulunmamaktadır. <Link to="/myAcount">Hesabıma</Link> giderek yeni adres ekleyiniz
+                </div>:false}
 
               <div className="userAdress">
-                {adress === "" ? (
+{openToServer===false? <Fragment>
+  {adress === "" ? (
                   <div className="adress">Bir Adres Seçiniz</div>
                 ) : (
-                  <AddressLocations>{myAdress}</AddressLocations>
+                  
+                  <AddressLocations>
+                  
+            
+                    {myAdress}
+                    
+                    </AddressLocations>
                 )}
+</Fragment>:<Fragment>
+  <ToServerInput type="text" onChange={(event)=>setMyAdress(event.target.value)}/>
+  </Fragment>}
+
+
+            
               </div>
             </div>
 
@@ -722,4 +743,13 @@ const OrderButton = styled.div`
     }
   }
 `;
+
+
+const ToServerInput = styled.textarea`
+outline-width: 0px;
+width: 250px;
+height: 80px;
+
+
+`
 export default CartConfirm;
