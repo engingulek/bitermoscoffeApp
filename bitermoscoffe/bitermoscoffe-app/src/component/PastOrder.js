@@ -96,7 +96,7 @@ function PastOrder() {
           </div>
           :<PastOrderProduct>
           <PastOrderProductTop>
-            <PastOrderDate> 17 Mayıs 2021</PastOrderDate>
+           
             <PastOrderCount>Adet: {orderPastList.length}</PastOrderCount>
             <PastOrderAmount>Fİyat : {pastOrderPrice}₺</PastOrderAmount>
           </PastOrderProductTop>
